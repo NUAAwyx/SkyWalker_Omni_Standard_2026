@@ -16,6 +16,7 @@ uint8_t DM_Motor_CAN_Message_Save_Zero[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,
  */
 void DVC_MOTOR_DM::Init(FDCAN_HandleTypeDef* hfdcan, CAN_Type can_type)
 {
+<<<<<<< HEAD
     // // 定义大喵电机的CAN对象并初始化
     // DM_CAN = std::make_shared<BSP_CAN>();
     // DM_CAN->Set_CAN_Type(can_type);
@@ -27,6 +28,19 @@ void DVC_MOTOR_DM::Init(FDCAN_HandleTypeDef* hfdcan, CAN_Type can_type)
     // // 使能电机
     // DM_CAN->Send_Data(&hfdcan2, ID, DM_Motor_CAN_Message_Clear_Error, 8); // 发送清除错误信息的CAN消息
     // DM_CAN->Send_Data(&hfdcan2, ID, DM_Motor_CAN_Message_Enter, 8); // 发送使能电机的CAN消息
+=======
+    // 定义大喵电机的CAN对象并初始化
+    DM_CAN = std::make_shared<BSP_CAN>();
+    DM_CAN->Set_CAN_Type(can_type);
+    DM_CAN->Init(hfdcan ,  nullptr);
+
+    // 确定电机CAN报文要发送的ID
+    ID = CAN_ID + ID_Offset;
+
+    // 使能电机
+    DM_CAN->Send_Data(&hfdcan2, ID, DM_Motor_CAN_Message_Clear_Error, 8); // 发送清除错误信息的CAN消息
+    DM_CAN->Send_Data(&hfdcan2, ID, DM_Motor_CAN_Message_Enter, 8); // 发送使能电机的CAN消息
+>>>>>>> 8c29ab67429aaf2e57ea41aee37da25fe17064eb
 }
 
 /**

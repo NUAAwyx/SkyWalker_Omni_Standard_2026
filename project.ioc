@@ -240,7 +240,11 @@ ProjectManager.ToolChainLocation=
 ProjectManager.UAScriptAfterPath=
 ProjectManager.UAScriptBeforePath=
 ProjectManager.UnderRoot=false
+<<<<<<< HEAD
 ProjectManager.functionlistsort=1-SystemClock_Config-RCC-false-HAL-false,2-MX_GPIO_Init-GPIO-false-HAL-true,3-MX_DMA_Init-DMA-false-HAL-true,4-MX_SPI2_Init-SPI2-false-HAL-true,5-MX_TIM3_Init-TIM3-false-HAL-true,6-MX_FDCAN3_Init-FDCAN3-false-HAL-true,7-MX_UART7_Init-UART7-false-HAL-true,8-MX_FDCAN2_Init-FDCAN2-false-HAL-true,0-MX_CORTEX_M7_Init-CORTEX_M7-false-HAL-true
+=======
+ProjectManager.functionlistsort=1-SystemClock_Config-RCC-false-HAL-false,2-MX_GPIO_Init-GPIO-false-HAL-true,3-MX_DMA_Init-DMA-false-HAL-true,4-MX_SPI2_Init-SPI2-false-HAL-true,5-MX_TIM3_Init-TIM3-false-HAL-true,6-MX_FDCAN3_Init-FDCAN3-false-HAL-true,7-MX_UART7_Init-UART7-false-HAL-true,0-MX_CORTEX_M7_Init-CORTEX_M7-false-HAL-true
+>>>>>>> 8c29ab67429aaf2e57ea41aee37da25fe17064eb
 RCC.ADCFreq_Value=48375000
 RCC.AHB12Freq_Value=240000000
 RCC.AHB4Freq_Value=240000000

@@ -2,6 +2,7 @@
 
 #include "cmsis_os2.h"
 #include "dvc_bmi088.h"
+<<<<<<< HEAD
 #include "dvc_motor_dji.h"
 #include "dvc_motor_dm.h"
 
@@ -12,10 +13,18 @@ DVC_MOTOR_DM motor_dm;
 
 static std::vector<std::shared_ptr<DVC_Motor_DJI>> chassis_motors;
 
+=======
+#include "dvc_motor_dm.h"
+
+DVC_BMI088 BMI088;
+DVC_MOTOR_DM motor_dm;
+
+>>>>>>> 8c29ab67429aaf2e57ea41aee37da25fe17064eb
 void Task_Init()
 {
     // 任务初始化代码
 
+<<<<<<< HEAD
     // BSP层初始化部分
 
     // 开启CAN通信
@@ -37,6 +46,8 @@ void Task_Init()
     chassis_motors[2]->Set_Data_to_send(2000);
     chassis_motors[3]->Set_Data_to_send(2000);
 
+=======
+>>>>>>> 8c29ab67429aaf2e57ea41aee37da25fe17064eb
     BMI088.Init();
     //motor_dm.Init();
 
@@ -57,8 +68,12 @@ void StartIMUTask(void *argument)
 
 void StartChassisTask(void *argument)
 {
+<<<<<<< HEAD
     for(;;) {
         fdcan3->FDCAN_Transmit_Task();
         osDelay(1);
     }
+=======
+
+>>>>>>> 8c29ab67429aaf2e57ea41aee37da25fe17064eb
 }
