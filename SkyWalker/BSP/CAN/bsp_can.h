@@ -69,8 +69,6 @@ public:
 
     uint8_t Send_Data(uint16_t ID, uint8_t *Data, uint32_t Length);
 
-    void Set_CAN_Type(CAN_Type can_type);
-
     void Register_TransmitCallback(uint16_t tx_id, uint8_t offset, FDCAN_Transmit_Filler_Callback callback);
     void Register_ReceiveCallback(uint32_t rx_id, FDCAN_ReceiveCallback callback);
 
@@ -78,6 +76,8 @@ public:
     void FIFO1_Rx_Callback();
 
 private:
+
+    void Set_CAN_Type(CAN_Type can_type);
 
     void Filter_Config(uint32_t id_type, uint32_t filter_index, uint32_t filter_type, uint32_t filter_config, uint32_t filter_id1, int32_t filter_id2);
 

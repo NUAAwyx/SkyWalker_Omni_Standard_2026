@@ -14,11 +14,9 @@ uint8_t DM_Motor_CAN_Message_Save_Zero[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,
  * （达妙可以用FDCAN，大疆只能用经典CAN，所以大疆电机部分没有can_type的配置部分）
  *
  */
-DVC_Motor_DM::DVC_Motor_DM(std::shared_ptr<BSP_CAN> can, CAN_Type can_type, Enum_Motor_DM_MODE motor_dm_mode, uint16_t receive_id, uint16_t can_id)
+DVC_Motor_DM::DVC_Motor_DM(std::shared_ptr<BSP_CAN> can, Enum_Motor_DM_MODE motor_dm_mode, uint16_t receive_id, uint16_t can_id)
     : DM_CAN(can), Motor_DM_Mode(motor_dm_mode), Receive_ID(receive_id)
 {
-    // 确定电机的CAN通信类型
-    DM_CAN->Set_CAN_Type(can_type);
     // 确定电机的CANID，上位机设定
     Set_CAN_ID(can_id);
     // 确定电机ID由模式造成的偏移量

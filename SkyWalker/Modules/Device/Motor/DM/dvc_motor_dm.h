@@ -49,7 +49,7 @@ class DVC_Motor_DM
 {
 public:
 
-    DVC_Motor_DM(std::shared_ptr<BSP_CAN> can, CAN_Type can_type, Enum_Motor_DM_MODE motor_dm_mode, uint16_t receive_id, uint16_t can_id);
+    DVC_Motor_DM(std::shared_ptr<BSP_CAN> can, Enum_Motor_DM_MODE motor_dm_mode, uint16_t receive_id, uint16_t can_id);
 
     void Set_Position_Designated(float position);
     void Set_Velocity_Designated(float velocity);

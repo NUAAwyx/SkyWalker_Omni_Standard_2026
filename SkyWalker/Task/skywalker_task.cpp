@@ -31,7 +31,7 @@ void Task_Init()
     chassis_motors.push_back(std::make_shared<DVC_Motor_DJI>(fdcan3, 3, M3508));
     chassis_motors.push_back(std::make_shared<DVC_Motor_DJI>(fdcan3, 4, M3508));
 
-    yaw_motor = std::make_shared<DVC_Motor_DM>(fdcan2, ClassicCAN, Motor_DM_MODE_MIT, 0x11, 0x01);
+    yaw_motor = std::make_shared<DVC_Motor_DM>(fdcan2, Motor_DM_MODE_MIT, 0x11, 0x01);
 
     // 以下部分用于测试
     chassis_motors[0]->Set_Data_to_send(2000);
