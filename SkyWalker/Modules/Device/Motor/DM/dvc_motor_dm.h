@@ -45,13 +45,11 @@ enum Enum_Motor_DM_ID_Offset
 };
 
 
-class DVC_MOTOR_DM
+class DVC_Motor_DM
 {
 public:
 
-    DVC_MOTOR_DM(std::shared_ptr<BSP_CAN> can, CAN_Type can_type, Enum_Motor_DM_MODE motor_dm_mode);
-
-    void Init(FDCAN_HandleTypeDef* hfdcan, CAN_Type can_type);
+    DVC_Motor_DM(std::shared_ptr<BSP_CAN> can, CAN_Type can_type, Enum_Motor_DM_MODE motor_dm_mode, uint16_t receive_id, uint16_t can_id);
 
     void Set_Position_Designated(float position);
     void Set_Velocity_Designated(float velocity);
@@ -59,6 +57,8 @@ public:
     void Set_MIT_K_P(int kp);
     void Set_MIT_K_D(int kd);
 
+    void Set_CAN_ID(uint16_t can_id);
+    void Set_Motor_Mode(Enum_Motor_DM_MODE mode);
 
 private:
 
@@ -66,25 +66,17 @@ private:
     void Handle_Receive_Data(const Struct_FDCAN_Receive_Management& Receive_Management);
 
     void Get_ID_Offset();
-    void Set_CAN_ID(uint16_t can_id);
-    void Set_Motor_Mode(Enum_Motor_DM_MODE mode);
 
     void Set_MIT_CAN_Message(uint8_t* Tx_Buffer);
     void Set_Position_Velocity_CAN_Message(uint8_t* Tx_Buffer);
     void Set_Velocity_CAN_Message(uint8_t* Tx_Buffer);
 
-    void Data_Process();
 
     // 用于达妙电机通信的CAN接口
     std::shared_ptr<BSP_CAN> DM_CAN;
 
     // 达妙电机工作模式
     Enum_Motor_DM_MODE Motor_DM_Mode;
-
-    // 发送缓冲区
-    uint8_t CAN_Tx_Data[8];
-    // 接收缓冲区
-    uint8_t CAN_Rx_Data[8];
 
     // 控制目标量
     float p_des;   // 目标位置，单位rad
@@ -113,7 +105,9 @@ private:
     uint16_t CAN_ID;
 
     // 电机实际发送报文的ID
-    uint16_t ID;
+    uint16_t Transmit_ID;
+    // 电机反馈报文ID
+    uint16_t Receive_ID;
 
     // 电机不同模式的ID偏移量
     uint16_t ID_Offset;

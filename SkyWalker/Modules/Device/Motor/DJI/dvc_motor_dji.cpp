@@ -40,16 +40,16 @@ DVC_Motor_DJI::DVC_Motor_DJI(std::shared_ptr<BSP_CAN> can, uint8_t id, Enum_Moto
         Receive_ID = 0x200 + ESC_ID;
     }
 
-    // 注册接收回调函数，将Handle_Receive_Data函数绑定到回调函数中，当CAN类的回调函数被执行时，该函数自动执行
-    DJI_CAN->Register_ReceiveCallback(Receive_ID, [this](const Struct_FDCAN_Receive_Management& Receive_Management)
-    {
-        this->Handle_Receive_Data(Receive_Management);
-    });
-
     // 注册发送回调函数
     DJI_CAN->Register_TransmitCallback(Transmit_ID, Transmit_ID_Offset, [this](uint8_t* Tx_Buffer)
     {
         this->Handle_Transmit_Data(Tx_Buffer);
+    });
+
+    // 注册接收回调函数，将Handle_Receive_Data函数绑定到回调函数中，当CAN类的回调函数被执行时，该函数自动执行
+    DJI_CAN->Register_ReceiveCallback(Receive_ID, [this](const Struct_FDCAN_Receive_Management& Receive_Management)
+    {
+        this->Handle_Receive_Data(Receive_Management);
     });
 }
 
@@ -90,7 +90,7 @@ void DVC_Motor_DJI::Handle_Receive_Data(const Struct_FDCAN_Receive_Management& R
     temperature = Receive_Management.rx_data[6] << 8;
 
     // 将反馈数据加工成实际可用数据
-    Angle = (encoder / Encoder_Max_Value) * 2 * PI;
+    Angle = encoder * 2 * PI / Encoder_Max_Value;
     Omega = rpm * RPM_to_RADPS;
     Torque = torque;
     Temperature = temperature;

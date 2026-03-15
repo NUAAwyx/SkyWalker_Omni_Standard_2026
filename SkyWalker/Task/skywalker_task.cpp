@@ -12,6 +12,8 @@ DVC_BMI088 BMI088;
 
 static std::vector<std::shared_ptr<DVC_Motor_DJI>> chassis_motors;
 
+auto yaw_motor = std::make_shared<DVC_Motor_DM>(fdcan2, FDCAN_Without_BitRate_Switch, Motor_DM_MODE_MIT, 0x11, 0x01);
+
 void Task_Init()
 {
     // 任务初始化代码
@@ -37,8 +39,13 @@ void Task_Init()
     chassis_motors[2]->Set_Data_to_send(2000);
     chassis_motors[3]->Set_Data_to_send(2000);
 
+    yaw_motor->Set_MIT_K_P(0);
+    yaw_motor->Set_MIT_K_D(0);
+    yaw_motor->Set_Position_Designated(0);
+    yaw_motor->Set_Velocity_Designated(0);
+    yaw_motor->Set_Torque_Designated(10);
+
     BMI088.Init();
-    //motor_dm.Init();
 
 
 }
@@ -57,8 +64,18 @@ void StartIMUTask(void *argument)
 
 void StartChassisTask(void *argument)
 {
-    for(;;) {
+    for(;;)
+    {
         fdcan3->FDCAN_Transmit_Task();
-        osDelay(1);
+        osDelay(10);
+    }
+}
+
+void StartGimbalTask(void *argument)
+{
+    for (;;)
+    {
+        fdcan2->FDCAN_Transmit_Task();
+        osDelay(10);
     }
 }

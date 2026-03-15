@@ -8,6 +8,7 @@ extern "C" {
 void Task_Init();
 void StartIMUTask(void *argument);
 void StartChassisTask(void *argument);
+void StartGimbalTask(void *argument);
 
 #ifdef __cplusplus
 }
