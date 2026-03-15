@@ -49,6 +49,8 @@ class DVC_MOTOR_DM
 {
 public:
 
+    DVC_MOTOR_DM(std::shared_ptr<BSP_CAN> can, CAN_Type can_type, Enum_Motor_DM_MODE motor_dm_mode);
+
     void Init(FDCAN_HandleTypeDef* hfdcan, CAN_Type can_type);
 
     void Set_Position_Designated(float position);
@@ -60,13 +62,16 @@ public:
 
 private:
 
+    void Handle_Transmit_Data(uint8_t *Tx_Buffer);
+    void Handle_Receive_Data(const Struct_FDCAN_Receive_Management& Receive_Management);
+
     void Get_ID_Offset();
     void Set_CAN_ID(uint16_t can_id);
     void Set_Motor_Mode(Enum_Motor_DM_MODE mode);
 
-    void Set_MIT_CAN_Message();
-    void Set_Position_Velocity_CAN_Message();
-    void Set_Velocity_CAN_Message();
+    void Set_MIT_CAN_Message(uint8_t* Tx_Buffer);
+    void Set_Position_Velocity_CAN_Message(uint8_t* Tx_Buffer);
+    void Set_Velocity_CAN_Message(uint8_t* Tx_Buffer);
 
     void Data_Process();
 

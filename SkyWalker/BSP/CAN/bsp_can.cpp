@@ -1,8 +1,8 @@
 #include "bsp_can.h"
 
 // 实例化CAN类
-//std::shared_ptr<BSP_CAN> fdcan1 = std::make_shared<BSP_CAN>(&hfdcan1);
-std::shared_ptr<BSP_CAN> fdcan2 = std::make_shared<BSP_CAN>(&hfdcan2, FDCAN_With_BitRate_Switch);
+std::shared_ptr<BSP_CAN> fdcan1 = std::make_shared<BSP_CAN>(&hfdcan1,ClassicCAN);
+std::shared_ptr<BSP_CAN> fdcan2 = std::make_shared<BSP_CAN>(&hfdcan2, FDCAN_Without_BitRate_Switch);
 std::shared_ptr<BSP_CAN> fdcan3 = std::make_shared<BSP_CAN>(&hfdcan3, ClassicCAN);
 
 /**
@@ -24,9 +24,9 @@ void BSP_CAN::Begin()
 {
     HAL_FDCAN_Start(hfdcan_);
 
-    //打开FIFO0区的新数据接收中断
+    //打开FIFO0区的新数据接收中断，FIFO模式不涉及具体缓冲区索引，所以bufferIndexes设0
     HAL_FDCAN_ActivateNotification(hfdcan_, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
-    //打开FIFO1区的新数据接收中断
+    //打开FIFO1区的新数据接收中断，FIFO模式不涉及具体缓冲区索引，所以bufferIndexes设0
     HAL_FDCAN_ActivateNotification(hfdcan_, FDCAN_IT_RX_FIFO1_NEW_MESSAGE, 0);
 
     if (hfdcan_->Instance == FDCAN1)
@@ -40,18 +40,18 @@ void BSP_CAN::Begin()
     else if (hfdcan_->Instance == FDCAN2)
     {
         // 配置滤波器
-        // 配置滤波器14，标准帧，mask模式，绑定到FIFO0，ID1为希望接收的ID，ID2为掩码
-        Filter_Config(FDCAN_STANDARD_ID, 14, FDCAN_FILTER_MASK, FDCAN_FILTER_TO_RXFIFO0, 0x000, 0x000);
-        // 配置滤波器15，标准帧，mask模式，绑定到FIFO1，ID1为希望接收的ID，ID2为掩码
-        Filter_Config(FDCAN_STANDARD_ID, 15, FDCAN_FILTER_MASK, FDCAN_FILTER_TO_RXFIFO1, 0x000, 0x000);
+        // 配置滤波器0，标准帧，mask模式，绑定到FIFO0，ID1为希望接收的ID，ID2为掩码
+        Filter_Config(FDCAN_STANDARD_ID, 0, FDCAN_FILTER_MASK, FDCAN_FILTER_TO_RXFIFO0, 0x000, 0x000);
+        // 配置滤波器1，标准帧，mask模式，绑定到FIFO1，ID1为希望接收的ID，ID2为掩码
+        Filter_Config(FDCAN_STANDARD_ID, 1, FDCAN_FILTER_MASK, FDCAN_FILTER_TO_RXFIFO1, 0x000, 0x000);
     }
     else if (hfdcan_->Instance == FDCAN3)
     {
         // 配置滤波器
-        // 配置滤波器28，标准帧，mask模式，绑定到FIFO0，ID1为希望接收的ID，ID2为掩码
-        Filter_Config(FDCAN_STANDARD_ID, 28, FDCAN_FILTER_MASK, FDCAN_FILTER_TO_RXFIFO0, 0x000, 0x000);
-        // 配置滤波器29，标准帧，mask模式，绑定到FIFO1，ID1为希望接收的ID，ID2为掩码
-        Filter_Config(FDCAN_STANDARD_ID, 29, FDCAN_FILTER_MASK, FDCAN_FILTER_TO_RXFIFO1, 0x000, 0x000);
+        // 配置滤波器0，标准帧，mask模式，绑定到FIFO0，ID1为希望接收的ID，ID2为掩码
+        Filter_Config(FDCAN_STANDARD_ID, 0, FDCAN_FILTER_MASK, FDCAN_FILTER_TO_RXFIFO0, 0x000, 0x000);
+        // 配置滤波器1，标准帧，mask模式，绑定到FIFO1，ID1为希望接收的ID，ID2为掩码
+        Filter_Config(FDCAN_STANDARD_ID, 1, FDCAN_FILTER_MASK, FDCAN_FILTER_TO_RXFIFO1, 0x000, 0x000);
     }
 }
 
@@ -214,14 +214,14 @@ void BSP_CAN::FIFO0_Rx_Callback()
         if (it != receive_map.end())
         {
             // 构造数据对象
-            Struct_FDCAN_Receive_Management data;
-            data.ID = id;
-            // 根据实际数据长度拷贝（DLC 存储在 rxHeader.DataLength 的高 16 位）
-            data.data_length = rxHeader.DataLength >> 16;
-            memcpy(data.rx_data, rxData, data.data_length);
+            Struct_FDCAN_Receive_Management FDCAN_Receive_Management;
+            FDCAN_Receive_Management.ID = id;
+            // 数据长度拷贝
+            FDCAN_Receive_Management.data_length = rxHeader.DataLength;
+            memcpy(FDCAN_Receive_Management.rx_data, rxData, FDCAN_Receive_Management.data_length);
 
             // 调用回调函数，将数据传给它。it->first就是那个ID本身，it->second就是与该ID绑定的回调函数。
-            it->second(data);
+            it->second(FDCAN_Receive_Management);
         }
     }
 }
@@ -244,14 +244,14 @@ void BSP_CAN::FIFO1_Rx_Callback()
         if (it != receive_map.end())
         {
             // 构造数据对象
-            Struct_FDCAN_Receive_Management data;
-            data.ID = id;
-            // 根据实际数据长度拷贝（DLC 存储在 rxHeader.DataLength 的高 16 位）
-            data.data_length = rxHeader.DataLength >> 16;
-            memcpy(data.rx_data, rxData, data.data_length);
+            Struct_FDCAN_Receive_Management FDCAN_Receive_Management;
+            FDCAN_Receive_Management.ID = id;
+            // 数据长度拷贝
+            FDCAN_Receive_Management.data_length = rxHeader.DataLength;
+            memcpy(FDCAN_Receive_Management.rx_data, rxData, FDCAN_Receive_Management.data_length);
 
             // 调用回调函数，将数据传给它。it->first就是那个ID本身，it->second就是与该ID绑定的回调函数。
-            it->second(data);
+            it->second(FDCAN_Receive_Management);
         }
     }
 }
@@ -261,7 +261,7 @@ void BSP_CAN::FIFO1_Rx_Callback()
  *
  * @param hfdcan FDCAN编号
  */
-void HAL_FDCAN_RxFifo0MsgPendingCallback(FDCAN_HandleTypeDef *hfdcan)
+void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 {
     if (hfdcan->Instance == FDCAN1)
     {
@@ -282,7 +282,7 @@ void HAL_FDCAN_RxFifo0MsgPendingCallback(FDCAN_HandleTypeDef *hfdcan)
  *
  * @param hfdcan FDCAN编号
  */
-void HAL_FDCAN_RxFifo1MsgPendingCallback(FDCAN_HandleTypeDef *hfdcan)
+void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 {
     if (hfdcan->Instance == FDCAN1)
     {

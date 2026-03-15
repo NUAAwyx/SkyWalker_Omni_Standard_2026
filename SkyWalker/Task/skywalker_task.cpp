@@ -8,7 +8,7 @@
 #include <vector>
 
 DVC_BMI088 BMI088;
-DVC_MOTOR_DM motor_dm;
+//DVC_MOTOR_DM motor_dm;
 
 static std::vector<std::shared_ptr<DVC_Motor_DJI>> chassis_motors;
 
@@ -19,7 +19,7 @@ void Task_Init()
     // BSP层初始化部分
 
     // 开启CAN通信
-    //fdcan1->Begin();
+    fdcan1->Begin();
     fdcan2->Begin();
     fdcan3->Begin();
 

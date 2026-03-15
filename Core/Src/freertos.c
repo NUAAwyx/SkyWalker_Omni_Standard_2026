@@ -53,14 +53,14 @@ osThreadId_t IMUTaskHandle;
 const osThreadAttr_t IMUTask_attributes = {
   .name = "IMUTask",
   .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+  .priority = (osPriority_t) osPriorityHigh,
 };
 /* Definitions for ChassisTask */
 osThreadId_t ChassisTaskHandle;
 const osThreadAttr_t ChassisTask_attributes = {
   .name = "ChassisTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityLow,
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityHigh,
 };
 /* Definitions for GimbalTask */
 osThreadId_t GimbalTaskHandle;

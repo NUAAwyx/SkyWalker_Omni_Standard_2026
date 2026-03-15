@@ -10,23 +10,50 @@ uint8_t DM_Motor_CAN_Message_Exit[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfd}
 uint8_t DM_Motor_CAN_Message_Save_Zero[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xfe};
 
 /**
- * @brief 初始化DM电机，包括定义CAN对象，确定帧ID，以及使能电机
+ * @brief 达妙电机构造函数，绑定CAN对象，确定帧ID，电机工作模式，使能电机
  * （达妙可以用FDCAN，大疆只能用经典CAN，所以大疆电机部分没有can_type的配置部分）
  *
  */
-void DVC_MOTOR_DM::Init(FDCAN_HandleTypeDef* hfdcan, CAN_Type can_type)
+DVC_MOTOR_DM::DVC_MOTOR_DM(std::shared_ptr<BSP_CAN> can, CAN_Type can_type, Enum_Motor_DM_MODE motor_dm_mode)
+    : DM_CAN(can), Motor_DM_Mode(motor_dm_mode)
 {
-    // // 定义大喵电机的CAN对象并初始化
-    // DM_CAN = std::make_shared<BSP_CAN>();
-    // DM_CAN->Set_CAN_Type(can_type);
-    // DM_CAN->Init(hfdcan ,  nullptr);
-    //
-    // // 确定电机CAN报文要发送的ID
-    // ID = CAN_ID + ID_Offset;
-    //
-    // // 使能电机
-    // DM_CAN->Send_Data(&hfdcan2, ID, DM_Motor_CAN_Message_Clear_Error, 8); // 发送清除错误信息的CAN消息
-    // DM_CAN->Send_Data(&hfdcan2, ID, DM_Motor_CAN_Message_Enter, 8); // 发送使能电机的CAN消息
+    DM_CAN->Set_CAN_Type(can_type);
+
+    // 确定电机CAN报文要发送的ID
+    ID = CAN_ID + ID_Offset;
+
+    // 使能电机
+    DM_CAN->Send_Data(ID, DM_Motor_CAN_Message_Clear_Error, 8); // 发送清除错误信息的CAN消息
+    DM_CAN->Send_Data(ID, DM_Motor_CAN_Message_Enter, 8); // 发送使能电机的CAN消息
+}
+
+/**
+ * @brief 达妙电机发送数据处理
+ *
+ * @param Tx_Buffer 发送回调函数传入的用于存放要发送数据的数组
+ */
+void DVC_MOTOR_DM::Handle_Transmit_Data(uint8_t *Tx_Buffer)
+{
+    switch (Motor_DM_Mode)
+    {
+        //case Motor_DM_MODE_MIT:
+    }
+}
+
+/**
+ * @brief 达妙电机接收数据处理
+ *
+ * @param Receive_Management 以常量引用方式传入的CAN接收数据管理结构体，减少调用开销防止数据被更改
+ */
+void DVC_MOTOR_DM::Handle_Receive_Data(const Struct_FDCAN_Receive_Management& Receive_Management)
+{
+    // 解析接收中断中的数据，更新电机状态
+    ERR = static_cast<Enum_Motor_DM_Error_Status>((Receive_Management.rx_data[0]) >> 4);
+    POS = ((Receive_Management.rx_data[1]) << 8) | Receive_Management.rx_data[2];
+    VEL = ((Receive_Management.rx_data[3]) << 4) | (Receive_Management.rx_data[4] >> 4);
+    T = ((Receive_Management.rx_data[4]) << 4) | Receive_Management.rx_data[5];
+    T_MOS = Receive_Management.rx_data[6];
+    T_Rotor = Receive_Management.rx_data[7];
 }
 
 /**
@@ -51,7 +78,7 @@ void DVC_MOTOR_DM::Data_Process()
  * MIT的控制命令格式将Position、Velocity、Kp、Kd、Torque五个参数按位组合在8个字节中。
  * 其中：Position占用2个字节16位、Velocity占用12位、Kp占用12位、Kd占用12位。
  */
-void DVC_MOTOR_DM::Set_MIT_CAN_Message()
+void DVC_MOTOR_DM::Set_MIT_CAN_Message(uint8_t* Tx_Buffer)
 {
     uint16_t p = static_cast<uint16_t>(p_des);      // 16位位置
     uint16_t v = static_cast<uint16_t>(v_des);      // 12位速度（存于16位变量）
@@ -59,53 +86,53 @@ void DVC_MOTOR_DM::Set_MIT_CAN_Message()
     uint16_t kd = static_cast<uint16_t>(MIT_K_D);   // 12位Kd
     uint16_t t = static_cast<uint16_t>(t_ff);       // 12位扭矩
 
-    CAN_Tx_Data[0] = (p >> 8) & 0xFF;
-    CAN_Tx_Data[1] = p & 0xFF;
-    CAN_Tx_Data[2] = (v >> 4) & 0xFF;
-    CAN_Tx_Data[3] = ((v & 0x0F) << 4) | ((kp >> 8) & 0x0F);
-    CAN_Tx_Data[4] = kp & 0xFF;
-    CAN_Tx_Data[5] = (kd >> 4) & 0xFF;
-    CAN_Tx_Data[6] = ((kd & 0x0F) << 4) | ((t >> 8) & 0x0F);
-    CAN_Tx_Data[7] = t & 0xFF;
+    Tx_Buffer[0] = (p >> 8) & 0xFF;
+    Tx_Buffer[1] = p & 0xFF;
+    Tx_Buffer[2] = (v >> 4) & 0xFF;
+    Tx_Buffer[3] = ((v & 0x0F) << 4) | ((kp >> 8) & 0x0F);
+    Tx_Buffer[4] = kp & 0xFF;
+    Tx_Buffer[5] = (kd >> 4) & 0xFF;
+    Tx_Buffer[6] = ((kd & 0x0F) << 4) | ((t >> 8) & 0x0F);
+    Tx_Buffer[7] = t & 0xFF;
 }
 
 /**
  * @brief 编辑位置速度模式下的达妙电机的发送报文
  * 要求输入的p_des，v_des均为浮点型，各占4个字节，低位在前，高位在后
  */
-void DVC_MOTOR_DM::Set_Position_Velocity_CAN_Message()
+void DVC_MOTOR_DM::Set_Position_Velocity_CAN_Message(uint8_t* Tx_Buffer)
 {
     uint32_t p_bits, v_bits;
     std::memcpy(&p_bits, &p_des, sizeof(p_des));
     std::memcpy(&v_bits, &v_des, sizeof(v_des));
 
-    CAN_Tx_Data[0] = (p_bits >> 0) & 0xFF;
-    CAN_Tx_Data[1] = (p_bits >> 8) & 0xFF;
-    CAN_Tx_Data[2] = (p_bits >> 16) & 0xFF;
-    CAN_Tx_Data[3] = (p_bits >> 24) & 0xFF;
-    CAN_Tx_Data[4] = (v_bits >> 0) & 0xFF;
-    CAN_Tx_Data[5] = (v_bits >> 8) & 0xFF;
-    CAN_Tx_Data[6] = (v_bits >> 16) & 0xFF;
-    CAN_Tx_Data[7] = (v_bits >> 24) & 0xFF;
+    Tx_Buffer[0] = (p_bits >> 0) & 0xFF;
+    Tx_Buffer[1] = (p_bits >> 8) & 0xFF;
+    Tx_Buffer[2] = (p_bits >> 16) & 0xFF;
+    Tx_Buffer[3] = (p_bits >> 24) & 0xFF;
+    Tx_Buffer[4] = (v_bits >> 0) & 0xFF;
+    Tx_Buffer[5] = (v_bits >> 8) & 0xFF;
+    Tx_Buffer[6] = (v_bits >> 16) & 0xFF;
+    Tx_Buffer[7] = (v_bits >> 24) & 0xFF;
 }
 
 /**
  * @brief 编辑速度模式下的达妙电机的发送报文
  * 要求输入的v_des为浮点型，占4个字节，低位在前，高位在后
  */
-void DVC_MOTOR_DM::Set_Velocity_CAN_Message()
+void DVC_MOTOR_DM::Set_Velocity_CAN_Message(uint8_t* Tx_Buffer)
 {
     uint32_t v_bits;
     std::memcpy(&v_bits, &v_des, sizeof(v_des));
 
-    CAN_Tx_Data[0] = (v_bits >> 0) & 0xFF;
-    CAN_Tx_Data[1] = (v_bits >> 8) & 0xFF;
-    CAN_Tx_Data[2] = (v_bits >> 16) & 0xFF;
-    CAN_Tx_Data[3] = (v_bits >> 24) & 0xFF;
-    CAN_Tx_Data[4] = 0;
-    CAN_Tx_Data[5] = 0;
-    CAN_Tx_Data[6] = 0;
-    CAN_Tx_Data[7] = 0;
+    Tx_Buffer[0] = (v_bits >> 0) & 0xFF;
+    Tx_Buffer[1] = (v_bits >> 8) & 0xFF;
+    Tx_Buffer[2] = (v_bits >> 16) & 0xFF;
+    Tx_Buffer[3] = (v_bits >> 24) & 0xFF;
+    Tx_Buffer[4] = 0;
+    Tx_Buffer[5] = 0;
+    Tx_Buffer[6] = 0;
+    Tx_Buffer[7] = 0;
 }
 
 /**

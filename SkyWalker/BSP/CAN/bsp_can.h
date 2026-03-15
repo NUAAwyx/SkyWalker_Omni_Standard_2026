@@ -47,7 +47,7 @@ struct Struct_FDCAN_Receive_Management
     // CAN接收缓冲区
     uint8_t rx_data[8];
     // 数据长度
-    uint16_t data_length;
+    uint32_t data_length;
 };
 
 /**
@@ -67,6 +67,8 @@ public:
 
     void FDCAN_Transmit_Task();
 
+    uint8_t Send_Data(uint16_t ID, uint8_t *Data, uint16_t Length);
+
     void Set_CAN_Type(CAN_Type can_type);
 
     void Register_TransmitCallback(uint16_t tx_id, uint8_t offset, FDCAN_Transmit_Filler_Callback callback);
@@ -79,8 +81,6 @@ private:
 
     void Filter_Config(uint32_t id_type, uint32_t filter_index, uint32_t filter_type, uint32_t filter_config, uint32_t filter_id1, int32_t filter_id2);
 
-    uint8_t Send_Data(uint16_t ID, uint8_t *Data, uint16_t Length);
-
     // CAN通信句柄
     FDCAN_HandleTypeDef* hfdcan_;
 
@@ -89,12 +89,11 @@ private:
 
     // 发送填充回调函数，multimap允许一个键对应多个值
     std::multimap<uint16_t, Struct_FDCAN_Transmit_Management> transmit_map;
-
     // 接收回调函数映射表，将ID与回调函数绑定，map只能一个键和一个值对应
     std::map<uint32_t, FDCAN_ReceiveCallback> receive_map;
 };
 
-//extern std::shared_ptr<BSP_CAN> fdcan1;
+extern std::shared_ptr<BSP_CAN> fdcan1;
 extern std::shared_ptr<BSP_CAN> fdcan2;
 extern std::shared_ptr<BSP_CAN> fdcan3;
 
