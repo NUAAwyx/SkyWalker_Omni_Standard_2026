@@ -67,7 +67,7 @@ public:
 
     void FDCAN_Transmit_Task();
 
-    uint8_t Send_Data(uint16_t ID, uint8_t *Data, uint16_t Length);
+    uint8_t Send_Data(uint16_t ID, uint8_t *Data, uint32_t Length);
 
     void Set_CAN_Type(CAN_Type can_type);
 

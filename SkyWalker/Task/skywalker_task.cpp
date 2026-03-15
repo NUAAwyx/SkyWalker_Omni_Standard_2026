@@ -8,11 +8,9 @@
 #include <vector>
 
 DVC_BMI088 BMI088;
-//DVC_MOTOR_DM motor_dm;
 
 static std::vector<std::shared_ptr<DVC_Motor_DJI>> chassis_motors;
-
-auto yaw_motor = std::make_shared<DVC_Motor_DM>(fdcan2, FDCAN_Without_BitRate_Switch, Motor_DM_MODE_MIT, 0x11, 0x01);
+static std::shared_ptr<DVC_Motor_DM> yaw_motor;
 
 void Task_Init()
 {
@@ -32,6 +30,8 @@ void Task_Init()
     chassis_motors.push_back(std::make_shared<DVC_Motor_DJI>(fdcan3, 2, M3508));
     chassis_motors.push_back(std::make_shared<DVC_Motor_DJI>(fdcan3, 3, M3508));
     chassis_motors.push_back(std::make_shared<DVC_Motor_DJI>(fdcan3, 4, M3508));
+
+    yaw_motor = std::make_shared<DVC_Motor_DM>(fdcan2, ClassicCAN, Motor_DM_MODE_MIT, 0x11, 0x01);
 
     // 以下部分用于测试
     chassis_motors[0]->Set_Data_to_send(2000);

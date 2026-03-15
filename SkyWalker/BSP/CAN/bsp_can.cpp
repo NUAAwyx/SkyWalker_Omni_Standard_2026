@@ -127,7 +127,7 @@ void BSP_CAN::Filter_Config(uint32_t id_type, uint32_t filter_index, uint32_t fi
  *
  * @return uint8_t 执行状态
  */
-uint8_t BSP_CAN::Send_Data(uint16_t ID, uint8_t *Data, uint16_t Length)
+uint8_t BSP_CAN::Send_Data(uint16_t ID, uint8_t *Data, uint32_t Length)
 {
     FDCAN_TxHeaderTypeDef tx_header;
 
