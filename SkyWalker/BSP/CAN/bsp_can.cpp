@@ -2,7 +2,7 @@
 
 // 实例化CAN类
 std::shared_ptr<BSP_CAN> fdcan1 = std::make_shared<BSP_CAN>(&hfdcan1,ClassicCAN);
-std::shared_ptr<BSP_CAN> fdcan2 = std::make_shared<BSP_CAN>(&hfdcan2, FDCAN_Without_BitRate_Switch);
+std::shared_ptr<BSP_CAN> fdcan2 = std::make_shared<BSP_CAN>(&hfdcan2, ClassicCAN);
 std::shared_ptr<BSP_CAN> fdcan3 = std::make_shared<BSP_CAN>(&hfdcan3, ClassicCAN);
 
 /**
