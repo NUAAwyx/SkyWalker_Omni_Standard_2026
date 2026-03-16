@@ -57,7 +57,7 @@ public:
     void Set_MIT_K_P(int kp);
     void Set_MIT_K_D(int kd);
 
-    void Set_Motor_Mode(Enum_Motor_DM_MODE mode);
+    //void Set_Motor_Mode(Enum_Motor_DM_MODE mode);
 
 private:
 
@@ -65,7 +65,7 @@ private:
     void Handle_Receive_Data(const Struct_FDCAN_Receive_Management& Receive_Management);
 
     void Get_ID_Offset();
-    void Set_CAN_ID(uint16_t can_id);
+    //void Set_CAN_ID(uint16_t can_id);
 
     void Set_MIT_CAN_Message(uint8_t* Tx_Buffer);
     void Set_Position_Velocity_CAN_Message(uint8_t* Tx_Buffer);

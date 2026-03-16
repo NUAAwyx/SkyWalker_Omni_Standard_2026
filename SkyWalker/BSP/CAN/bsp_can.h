@@ -77,8 +77,6 @@ public:
 
 private:
 
-    void Set_CAN_Type(CAN_Type can_type);
-
     void Filter_Config(uint32_t id_type, uint32_t filter_index, uint32_t filter_type, uint32_t filter_config, uint32_t filter_id1, int32_t filter_id2);
 
     // CAN通信句柄

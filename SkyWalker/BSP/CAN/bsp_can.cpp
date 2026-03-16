@@ -1,7 +1,7 @@
 #include "bsp_can.h"
 
 // 实例化CAN类
-std::shared_ptr<BSP_CAN> fdcan1 = std::make_shared<BSP_CAN>(&hfdcan1,ClassicCAN);
+std::shared_ptr<BSP_CAN> fdcan1 = std::make_shared<BSP_CAN>(&hfdcan1, ClassicCAN);
 std::shared_ptr<BSP_CAN> fdcan2 = std::make_shared<BSP_CAN>(&hfdcan2, ClassicCAN);
 std::shared_ptr<BSP_CAN> fdcan3 = std::make_shared<BSP_CAN>(&hfdcan3, ClassicCAN);
 
@@ -12,7 +12,7 @@ std::shared_ptr<BSP_CAN> fdcan3 = std::make_shared<BSP_CAN>(&hfdcan3, ClassicCAN
 BSP_CAN::BSP_CAN(FDCAN_HandleTypeDef* hfdcan, CAN_Type can_type)
 {
     hfdcan_ = hfdcan;
-    Set_CAN_Type(can_type);
+    CAN_Type_Used = can_type;
 }
 
 /**
@@ -160,15 +160,6 @@ uint8_t BSP_CAN::Send_Data(uint16_t ID, uint8_t *Data, uint32_t Length)
     tx_header.MessageMarker = 0; // 消息标记
 
     return (HAL_FDCAN_AddMessageToTxFifoQ(hfdcan_, &tx_header, Data));
-}
-
-/**
- * @brief 设定使用的CAN类型
- *
- */
-void BSP_CAN::Set_CAN_Type(CAN_Type can_type)
-{
-    CAN_Type_Used = can_type;
 }
 
 /**

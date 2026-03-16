@@ -15,10 +15,10 @@ uint8_t DM_Motor_CAN_Message_Save_Zero[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,
  *
  */
 DVC_Motor_DM::DVC_Motor_DM(std::shared_ptr<BSP_CAN> can, Enum_Motor_DM_MODE motor_dm_mode, uint16_t receive_id, uint16_t can_id)
-    : DM_CAN(can), Motor_DM_Mode(motor_dm_mode), Receive_ID(receive_id)
+    : DM_CAN(can), Motor_DM_Mode(motor_dm_mode), Receive_ID(receive_id), CAN_ID(can_id)
 {
     // 确定电机的CANID，上位机设定
-    Set_CAN_ID(can_id);
+    //Set_CAN_ID(can_id);
     // 确定电机ID由模式造成的偏移量
     Get_ID_Offset();
 
@@ -27,7 +27,9 @@ DVC_Motor_DM::DVC_Motor_DM(std::shared_ptr<BSP_CAN> can, Enum_Motor_DM_MODE moto
 
     // 使能电机
     DM_CAN->Send_Data(Transmit_ID, DM_Motor_CAN_Message_Clear_Error, 8); // 发送清除错误信息的CAN消息
+    HAL_Delay(1);
     DM_CAN->Send_Data(Transmit_ID, DM_Motor_CAN_Message_Enter, 8); // 发送使能电机的CAN消息
+    HAL_Delay(1);
 
     // 注册发送回调函数
     DM_CAN->Register_TransmitCallback(Transmit_ID,0,[this](uint8_t* Tx_Buffer)
@@ -217,22 +219,22 @@ void DVC_Motor_DM::Get_ID_Offset()
     }
 }
 
-/**
- * @brief 设置达妙电机的CAN_ID，实际由上位机设置，此处仅简单赋值
- *
- * @param can_id 上位机设定的电机CAN_ID
- */
-void DVC_Motor_DM::Set_CAN_ID(uint16_t can_id)
-{
-    CAN_ID = can_id;
-}
-
-/**
- * @brief 设置达妙电机的控制模式，实际由上位机设置，此处仅简单赋值
- *
- * @param mode 上位机设定的电机工作状态
- */
-void DVC_Motor_DM::Set_Motor_Mode(Enum_Motor_DM_MODE mode)
-{
-    Motor_DM_Mode = mode;
-}
+// /**
+//  * @brief 设置达妙电机的CAN_ID，实际由上位机设置，此处仅简单赋值
+//  *
+//  * @param can_id 上位机设定的电机CAN_ID
+//  */
+// void DVC_Motor_DM::Set_CAN_ID(uint16_t can_id)
+// {
+//     CAN_ID = can_id;
+// }
+//
+// /**
+//  * @brief 设置达妙电机的控制模式，实际由上位机设置，此处仅简单赋值
+//  *
+//  * @param mode 上位机设定的电机工作状态
+//  */
+// void DVC_Motor_DM::Set_Motor_Mode(Enum_Motor_DM_MODE mode)
+// {
+//     Motor_DM_Mode = mode;
+// }
