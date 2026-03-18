@@ -9,9 +9,9 @@ std::shared_ptr<BSP_CAN> fdcan3 = std::make_shared<BSP_CAN>(&hfdcan3, ClassicCAN
  * @brief CAN类的构造函数
  *
  */
-BSP_CAN::BSP_CAN(FDCAN_HandleTypeDef* hfdcan, CAN_Type can_type)
+BSP_CAN::BSP_CAN(FDCAN_HandleTypeDef* hfdcan_, CAN_Type can_type)
 {
-    hfdcan_ = hfdcan;
+    hfdcan = hfdcan_;
     CAN_Type_Used = can_type;
 }
 
@@ -22,14 +22,14 @@ BSP_CAN::BSP_CAN(FDCAN_HandleTypeDef* hfdcan, CAN_Type can_type)
  */
 void BSP_CAN::Begin()
 {
-    HAL_FDCAN_Start(hfdcan_);
+    HAL_FDCAN_Start(hfdcan);
 
     //打开FIFO0区的新数据接收中断，FIFO模式不涉及具体缓冲区索引，所以bufferIndexes设0
-    HAL_FDCAN_ActivateNotification(hfdcan_, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
+    HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
     //打开FIFO1区的新数据接收中断，FIFO模式不涉及具体缓冲区索引，所以bufferIndexes设0
-    HAL_FDCAN_ActivateNotification(hfdcan_, FDCAN_IT_RX_FIFO1_NEW_MESSAGE, 0);
+    HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO1_NEW_MESSAGE, 0);
 
-    if (hfdcan_->Instance == FDCAN1)
+    if (hfdcan->Instance == FDCAN1)
     {
         // 配置滤波器
         // 配置滤波器0，标准帧，mask模式，绑定到FIFO0，ID1为希望接收的ID，ID2为掩码
@@ -37,7 +37,7 @@ void BSP_CAN::Begin()
         // 配置滤波器1，标准帧，mask模式，绑定到FIFO1，ID1为希望接收的ID，ID2为掩码
         Filter_Config(FDCAN_STANDARD_ID, 1, FDCAN_FILTER_MASK, FDCAN_FILTER_TO_RXFIFO1, 0x000, 0x000);
     }
-    else if (hfdcan_->Instance == FDCAN2)
+    else if (hfdcan->Instance == FDCAN2)
     {
         // 配置滤波器
         // 配置滤波器0，标准帧，mask模式，绑定到FIFO0，ID1为希望接收的ID，ID2为掩码
@@ -45,7 +45,7 @@ void BSP_CAN::Begin()
         // 配置滤波器1，标准帧，mask模式，绑定到FIFO1，ID1为希望接收的ID，ID2为掩码
         Filter_Config(FDCAN_STANDARD_ID, 1, FDCAN_FILTER_MASK, FDCAN_FILTER_TO_RXFIFO1, 0x000, 0x000);
     }
-    else if (hfdcan_->Instance == FDCAN3)
+    else if (hfdcan->Instance == FDCAN3)
     {
         // 配置滤波器
         // 配置滤波器0，标准帧，mask模式，绑定到FIFO0，ID1为希望接收的ID，ID2为掩码
@@ -66,7 +66,7 @@ void BSP_CAN::FDCAN_Transmit_Task()
     // 要发送的数据段
     uint8_t frameData[8] = {0};
 
-    for (auto it = transmit_map.begin(); it != transmit_map.end(); ++it)
+    for (auto it = transmit_callback_map.begin(); it != transmit_callback_map.end(); ++it)
     {
         // 当遍历的迭代器指向的条目ID与当前正在处理的ID不同时，说明已经遇到了一个新发送ID。
         // 此时需要先将上一个ID已收集的数据发送出去（如果上一个ID有效），然后切换到新的ID。
@@ -111,10 +111,10 @@ void BSP_CAN::Filter_Config(uint32_t id_type, uint32_t filter_index, uint32_t fi
     filter.FilterID2 = filter_id2;
 
     // 配置具体的单个过滤器元素，即向 FDCAN 过滤器列表中添加一条过滤规则（例如：标准 ID 或扩展 ID 的掩码模式、列表模式等）
-    HAL_FDCAN_ConfigFilter(hfdcan_, &filter);
+    HAL_FDCAN_ConfigFilter(hfdcan, &filter);
 
     // 配置全局过滤器，即定义那些没有匹配到任何已配置的特定 ID 过滤器的帧的处理方式，以及远程帧的默认处理方式
-    HAL_FDCAN_ConfigGlobalFilter(hfdcan_, FDCAN_REJECT, FDCAN_REJECT, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE);
+    HAL_FDCAN_ConfigGlobalFilter(hfdcan, FDCAN_REJECT, FDCAN_REJECT, FDCAN_FILTER_REMOTE, FDCAN_FILTER_REMOTE);
 }
 
 
@@ -159,7 +159,7 @@ uint8_t BSP_CAN::Send_Data(uint16_t ID, uint8_t *Data, uint32_t Length)
     tx_header.TxEventFifoControl = FDCAN_NO_TX_EVENTS; // 事件FIFO控制
     tx_header.MessageMarker = 0; // 消息标记
 
-    return (HAL_FDCAN_AddMessageToTxFifoQ(hfdcan_, &tx_header, Data));
+    return (HAL_FDCAN_AddMessageToTxFifoQ(hfdcan, &tx_header, Data));
 }
 
 /**
@@ -173,7 +173,7 @@ uint8_t BSP_CAN::Send_Data(uint16_t ID, uint8_t *Data, uint32_t Length)
 void BSP_CAN::Register_TransmitCallback(uint16_t tx_id, uint8_t offset, FDCAN_Transmit_Filler_Callback callback)
 {
     // std::multimap的元素类型是std::pair<const Key, Value>。使用emplace时，你只需要提供构造Key和Value所需的参数，emplace会在容器内部就地构造一个pair对象，然后将其插入到map中。
-    transmit_map.emplace(tx_id, Struct_FDCAN_Transmit_Management{offset, callback});
+    transmit_callback_map.emplace(tx_id, Struct_FDCAN_Transmit_Management{offset, callback});
 }
 
 /**
@@ -184,7 +184,7 @@ void BSP_CAN::Register_TransmitCallback(uint16_t tx_id, uint8_t offset, FDCAN_Tr
  */
 void BSP_CAN::Register_ReceiveCallback(uint32_t rx_id, FDCAN_ReceiveCallback callback)
 {
-    receive_map[rx_id] = callback;
+    receive_callback_map[rx_id] = callback;
 }
 
 /**
@@ -197,12 +197,12 @@ void BSP_CAN::FIFO0_Rx_Callback()
     uint8_t rxData[8];
 
     // 从 FIFO0读取一帧
-    if (HAL_FDCAN_GetRxMessage(hfdcan_, FDCAN_RX_FIFO0, &rxHeader, rxData) == HAL_OK)
+    if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &rxHeader, rxData) == HAL_OK)
     {
         uint32_t id = rxHeader.Identifier;
         // 在映射表中查找该 ID 对应的回调
-        auto it = receive_map.find(id);
-        if (it != receive_map.end())
+        auto it = receive_callback_map.find(id);
+        if (it != receive_callback_map.end())
         {
             // 构造数据对象
             Struct_FDCAN_Receive_Management FDCAN_Receive_Management;
@@ -227,12 +227,12 @@ void BSP_CAN::FIFO1_Rx_Callback()
     uint8_t rxData[8];
 
     // 从 FIFO1读取一帧
-    if (HAL_FDCAN_GetRxMessage(hfdcan_, FDCAN_RX_FIFO1, &rxHeader, rxData) == HAL_OK)
+    if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO1, &rxHeader, rxData) == HAL_OK)
     {
         uint32_t id = rxHeader.Identifier;
         // 在映射表中查找该 ID 对应的回调
-        auto it = receive_map.find(id);
-        if (it != receive_map.end())
+        auto it = receive_callback_map.find(id);
+        if (it != receive_callback_map.end())
         {
             // 构造数据对象
             Struct_FDCAN_Receive_Management FDCAN_Receive_Management;

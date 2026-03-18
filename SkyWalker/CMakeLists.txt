@@ -29,6 +29,7 @@ set(SkyWalker_Include_Dirs
         ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Device/Motor/DM
         ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Device/DR16
         ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Device/Referee
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Device/Communication
 
         # Algorithm
         ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Algorithm/EKF
@@ -65,6 +66,7 @@ set(SkyWalker_Modules_Src
         ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Device/Motor/DM/dvc_motor_dm.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Device/DR16/dvc_dr16.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Device/Referee/dvc_referee.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Device/Communication/dvc_communication.cpp
 
         ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Algorithm/EKF/alg_ekf.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Modules/Algorithm/PID/alg_pid.cpp

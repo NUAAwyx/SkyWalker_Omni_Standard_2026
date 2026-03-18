@@ -4,6 +4,13 @@
 #include <memory>
 
 #include "bsp_can.h"
+#include "alg_pid.h"
+
+enum Enum_DM_Motor_Work_Mode
+{
+    DM_Position = 0,
+    DM_Velocity,
+};
 
 /**
  * @brief 达妙电机控制模式
@@ -49,7 +56,10 @@ class DVC_Motor_DM
 {
 public:
 
-    DVC_Motor_DM(std::shared_ptr<BSP_CAN> can, Enum_Motor_DM_MODE motor_dm_mode, uint16_t receive_id, uint16_t can_id);
+    DVC_Motor_DM(std::shared_ptr<BSP_CAN> can, Enum_Motor_DM_MODE motor_dm_mode, uint16_t receive_id, uint16_t can_id,
+        float p_max, float v_max, float t_max, Enum_DM_Motor_Work_Mode work_mode);
+
+    void MIT_Torque_Control();
 
     void Set_Position_Designated(float position);
     void Set_Velocity_Designated(float velocity);
@@ -57,7 +67,26 @@ public:
     void Set_MIT_K_P(int kp);
     void Set_MIT_K_D(int kd);
 
-    //void Set_Motor_Mode(Enum_Motor_DM_MODE mode);
+    float Get_Target_Angle();
+    float Get_Target_Omega();
+    float Get_Now_Angle();
+    float Get_Now_Omega();
+
+    void Set_Target_Angle(float angle);
+    void Set_Now_Angle(float angle);
+    void Set_Target_Omega(float omega);
+    void Set_Now_Omega(float omega);
+
+    void Set_Velocity_PID_KP(float kp_);
+    void Set_Velocity_PID_KI(float ki_);
+    void Set_Velocity_PID_KD(float kd_);
+    void Set_Velocity_PID_Feedback(float feedback_);
+
+    void Set_Position_PID_KP(float kp_);
+    void Set_Position_PID_KI(float ki_);
+    void Set_Position_PID_KD(float kd_);
+    void Set_Position_PID_Feedback(float feedback_);
+
 
 private:
 
@@ -65,15 +94,23 @@ private:
     void Handle_Receive_Data(const Struct_FDCAN_Receive_Management& Receive_Management);
 
     void Get_ID_Offset();
-    //void Set_CAN_ID(uint16_t can_id);
 
     void Set_MIT_CAN_Message(uint8_t* Tx_Buffer);
     void Set_Position_Velocity_CAN_Message(uint8_t* Tx_Buffer);
     void Set_Velocity_CAN_Message(uint8_t* Tx_Buffer);
 
 
+    float P_Max;
+    float V_Max;
+    float T_Max;
+
     // 用于达妙电机通信的CAN接口
     std::shared_ptr<BSP_CAN> DM_CAN;
+
+    // 达妙电机的位置PID对象
+    std::shared_ptr<Alg_PID> DM_PID_Position;
+    // 达妙电机的速度PID对象
+    std::shared_ptr<Alg_PID> DM_PID_Velocity;
 
     // 达妙电机工作模式
     Enum_Motor_DM_MODE Motor_DM_Mode;
@@ -95,11 +132,11 @@ private:
 
     // 达妙电机当前状态数据
     Enum_Motor_DM_Error_Status Error_Status;  // 电机当前故障类型
-    uint16_t Position;                        // 电机当前编码器值
-    uint16_t Omega;                           // 电机当前速度
-    uint16_t Torqe;                           // 电机当前力矩
-    uint8_t Temperature_MOS;                  // 电机当前MOS管温度
-    uint8_t Temperature_Rotor;                // 电机当前转子温度
+    float Angle;                           // 电机当前编码器值
+    float Omega;                           // 电机当前速度
+    float Torqe;                           // 电机当前力矩
+    float Temperature_MOS;                  // 电机当前MOS管温度
+    float Temperature_Rotor;                // 电机当前转子温度
 
     // 电机CAN_ID，由上位机设定
     uint16_t CAN_ID;
@@ -111,6 +148,15 @@ private:
 
     // 电机不同模式的ID偏移量
     uint16_t ID_Offset;
+
+    // 电机控制目标量
+    float Target_Angle; // 目标角度
+    float Now_Angle;    // 当前角度
+    float Target_Omega; // 目标角速度
+    float Now_Omega;    // 当前角速度
+
+    // 电机工作类型
+    Enum_DM_Motor_Work_Mode Work_Mode;
 };
 
 

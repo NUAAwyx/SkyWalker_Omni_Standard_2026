@@ -14,11 +14,11 @@ uint8_t DM_Motor_CAN_Message_Save_Zero[8] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,
  * （达妙可以用FDCAN，大疆只能用经典CAN，所以大疆电机部分没有can_type的配置部分）
  *
  */
-DVC_Motor_DM::DVC_Motor_DM(std::shared_ptr<BSP_CAN> can, Enum_Motor_DM_MODE motor_dm_mode, uint16_t receive_id, uint16_t can_id)
-    : DM_CAN(can), Motor_DM_Mode(motor_dm_mode), Receive_ID(receive_id), CAN_ID(can_id)
+DVC_Motor_DM::DVC_Motor_DM(std::shared_ptr<BSP_CAN> can, Enum_Motor_DM_MODE motor_dm_mode, uint16_t receive_id, uint16_t can_id,
+    float p_max, float v_max, float t_max, Enum_DM_Motor_Work_Mode work_mode)
+    : DM_CAN(can), Motor_DM_Mode(motor_dm_mode), Receive_ID(receive_id), CAN_ID(can_id),
+        P_Max(p_max), V_Max(v_max), T_Max(t_max), Work_Mode(work_mode)
 {
-    // 确定电机的CANID，上位机设定
-    //Set_CAN_ID(can_id);
     // 确定电机ID由模式造成的偏移量
     Get_ID_Offset();
 
@@ -81,6 +81,46 @@ void DVC_Motor_DM::Handle_Receive_Data(const Struct_FDCAN_Receive_Management& Re
     T = ((Receive_Management.rx_data[4]) << 4) | Receive_Management.rx_data[5];
     T_MOS = Receive_Management.rx_data[6];
     T_Rotor = Receive_Management.rx_data[7];
+
+    Angle = POS / 65535 * P_Max;
+    Omega = VEL / 4095 * V_Max;
+    Torqe = T / 4095 * T_Max;
+    Temperature_MOS = T_MOS;
+    Temperature_Rotor = T_Rotor;
+
+    Set_Now_Angle(Angle);
+    Set_Now_Omega(Omega);
+}
+
+/**
+ * @brief 达妙电机MIT协议下只使用扭矩控制，自己写PID
+ *
+ */
+void DVC_Motor_DM::MIT_Torque_Control()
+{
+    float current = 0;
+
+    if (Work_Mode == DM_Position)
+    {
+        float temp_target_omega;
+
+        DM_PID_Position->Set_Target(Target_Angle);
+        DM_PID_Position->Set_Now(Now_Angle);
+        DM_PID_Position->Update();
+        temp_target_omega = DM_PID_Position->Get_Output();
+        DM_PID_Velocity->Set_Target(temp_target_omega);
+        DM_PID_Velocity->Set_Now(Omega);
+        DM_PID_Velocity->Update();
+        current = DM_PID_Velocity->Get_Output();
+    }
+    else if (Work_Mode == DM_Velocity)
+    {
+        DM_PID_Velocity->Set_Target(Target_Omega);
+        DM_PID_Velocity->Set_Now(Now_Omega);
+        DM_PID_Velocity->Update();
+        current = DM_PID_Velocity->Get_Output();
+    }
+    Set_Torque_Designated(current);
 }
 
 /**
@@ -219,22 +259,147 @@ void DVC_Motor_DM::Get_ID_Offset()
     }
 }
 
-// /**
-//  * @brief 设置达妙电机的CAN_ID，实际由上位机设置，此处仅简单赋值
-//  *
-//  * @param can_id 上位机设定的电机CAN_ID
-//  */
-// void DVC_Motor_DM::Set_CAN_ID(uint16_t can_id)
-// {
-//     CAN_ID = can_id;
-// }
-//
-// /**
-//  * @brief 设置达妙电机的控制模式，实际由上位机设置，此处仅简单赋值
-//  *
-//  * @param mode 上位机设定的电机工作状态
-//  */
-// void DVC_Motor_DM::Set_Motor_Mode(Enum_Motor_DM_MODE mode)
-// {
-//     Motor_DM_Mode = mode;
-// }
+
+/**
+ * @brief 设定角速度PID环的KP
+ *
+ */
+void DVC_Motor_DM::Set_Velocity_PID_KP(float kp_)
+{
+    DM_PID_Velocity->Set_KP(kp_);
+}
+
+/**
+ * @brief 设定角速度PID环的KI
+ *
+ */
+void DVC_Motor_DM::Set_Velocity_PID_KI(float ki_)
+{
+    DM_PID_Velocity->Set_KI(ki_);
+}
+
+/**
+ * @brief 设定角速度PID环的KD
+ *
+ */
+void DVC_Motor_DM::Set_Velocity_PID_KD(float kd_)
+{
+    DM_PID_Velocity->Set_KD(kd_);
+}
+
+/**
+ * @brief 设定角速度PID环的Feedback
+ *
+ */
+void DVC_Motor_DM::Set_Velocity_PID_Feedback(float feedback_)
+{
+    DM_PID_Velocity->Set_FeedForward(feedback_);
+}
+
+/**
+ * @brief 设定角度PID环的KP
+ *
+ */
+void DVC_Motor_DM::Set_Position_PID_KP(float kp_)
+{
+    DM_PID_Position->Set_KP(kp_);
+}
+
+/**
+ * @brief 设定角速度PID环的KI
+ *
+ */
+void DVC_Motor_DM::Set_Position_PID_KI(float ki_)
+{
+    DM_PID_Position->Set_KI(ki_);
+}
+
+/**
+ * @brief 设定角速度PID环的KD
+ *
+ */
+void DVC_Motor_DM::Set_Position_PID_KD(float kd_)
+{
+    DM_PID_Position->Set_KD(kd_);
+}
+
+/**
+ * @brief 设定角速度PID环的Feedback
+ *
+ */
+void DVC_Motor_DM::Set_Position_PID_Feedback(float feedback_)
+{
+    DM_PID_Position->Set_FeedForward(feedback_);
+}
+
+/**
+ * @brief 获取电机目标角度值
+ *
+ */
+float DVC_Motor_DM::Get_Target_Angle()
+{
+    return Target_Angle;
+}
+
+/**
+ * @brief 获取电机目标角速度值
+ *
+ */
+float DVC_Motor_DM::Get_Target_Omega()
+{
+    return Target_Omega;
+}
+
+/**
+ * @brief 获取电机当前角度值
+ *
+ */
+float DVC_Motor_DM::Get_Now_Angle()
+{
+    return Angle;
+}
+
+/**
+ * @brief 获取当前电机角速度值
+ *
+ */
+float DVC_Motor_DM::Get_Now_Omega()
+{
+    return Omega;
+}
+
+/**
+ * @brief 设定目标角度，设定范围为-PI~PI
+ *
+ */
+void DVC_Motor_DM::Set_Target_Angle(float angle)
+{
+    Target_Angle = angle;
+}
+
+/**
+ * @brief 设定当前角度
+ *
+ */
+void DVC_Motor_DM::Set_Now_Angle(float angle)
+{
+    Now_Angle = angle;
+}
+
+/**
+ * @brief 设定目标角速度
+ *
+ */
+void DVC_Motor_DM::Set_Target_Omega(float omega)
+{
+    Target_Omega = omega;
+}
+
+/**
+ * @brief 设定当前角速度
+ *
+ */
+void DVC_Motor_DM::Set_Now_Omega(float omega)
+{
+    Now_Omega = omega;
+}
