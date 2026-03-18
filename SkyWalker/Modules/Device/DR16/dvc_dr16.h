@@ -41,11 +41,6 @@ public:
 
     void Handle_Receive_Data(const Struct_UART_Receive_Management& Receive_Management);
 
-private:
-
-    // 串口类指针
-    std::shared_ptr<BSP_USART> uart;
-
     //遥控器数据
     int16_t Right_X;
     int16_t Right_Y;
@@ -82,7 +77,13 @@ private:
     uint8_t v;
     uint8_t b;
 
+private:
+
+    // 串口类指针
+    std::shared_ptr<BSP_USART> uart;
+
 };
 
+extern std::shared_ptr<DVC_DR16> DR16;
 
 #endif

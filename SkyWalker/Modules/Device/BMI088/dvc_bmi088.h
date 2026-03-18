@@ -47,11 +47,19 @@ class DVC_BMI088
 public:
 
     DVC_BMI088(std::shared_ptr<BSP_SPI> spi_);
+
     void Init();
     void Accel_Init();
     void Gyro_Init();
 
     void Read_Data();
+
+    float Get_Accel_X();
+    float Get_Accel_Y();
+    float Get_Accel_Z();
+    float Get_Gyro_X();
+    float Get_Gyro_Y();
+    float Get_Gyro_Z();
 
 private:
 

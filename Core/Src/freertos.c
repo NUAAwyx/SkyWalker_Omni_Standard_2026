@@ -69,6 +69,13 @@ const osThreadAttr_t GimbalTask_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
+/* Definitions for FDCANTransmitTa */
+osThreadId_t FDCANTransmitTaHandle;
+const osThreadAttr_t FDCANTransmitTa_attributes = {
+  .name = "FDCANTransmitTa",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityHigh,
+};
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -78,6 +85,7 @@ const osThreadAttr_t GimbalTask_attributes = {
 void StartAimBoosterTask(void *argument);
 void StartChassisTask(void *argument);
 void StartGimbalTask(void *argument);
+void StartFDCANTransmitTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -116,6 +124,9 @@ void MX_FREERTOS_Init(void) {
 
   /* creation of GimbalTask */
   GimbalTaskHandle = osThreadNew(StartGimbalTask, NULL, &GimbalTask_attributes);
+
+  /* creation of FDCANTransmitTa */
+  FDCANTransmitTaHandle = osThreadNew(StartFDCANTransmitTask, NULL, &FDCANTransmitTa_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -179,6 +190,24 @@ __weak void StartGimbalTask(void *argument)
     osDelay(1);
   }
   /* USER CODE END StartGimbalTask */
+}
+
+/* USER CODE BEGIN Header_StartFDCANTransmitTask */
+/**
+* @brief Function implementing the FDCANTransmitTa thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartFDCANTransmitTask */
+__weak void StartFDCANTransmitTask(void *argument)
+{
+  /* USER CODE BEGIN StartFDCANTransmitTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartFDCANTransmitTask */
 }
 
 /* Private application code --------------------------------------------------*/

@@ -786,10 +786,8 @@ private:
     Struct_Referee_Rx_Radar_Map_Data Radar_Map_Data;
     Struct_Referee_Rx_Path_Data Path_Data;
     Struct_Referee_Rx_Custom_Info Custom_Info;
-
-
 };
 
-
+extern std::shared_ptr<DVC_REFEREE> Referee;
 
 #endif

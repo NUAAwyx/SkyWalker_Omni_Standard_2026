@@ -3,6 +3,8 @@
 #define CRC8_INIT_VALUE  0xFF
 #define CRC16_INIT_VALUE 0xFFFF
 
+std::shared_ptr<DVC_REFEREE> Referee = std::make_shared<DVC_REFEREE>(usart1, 0xA5);
+
 // CRC8校验表 (RM2026协议标准)
 static const uint8_t crc_8_table[256] =
 {

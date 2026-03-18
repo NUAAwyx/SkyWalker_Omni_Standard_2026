@@ -113,7 +113,7 @@ void DVC_Motor_DJI::Motor_Control()
     if (current >  Motor_Max_Current) current =  Motor_Max_Current;
     if (current < -Motor_Max_Current) current = -Motor_Max_Current;
 
-    Set_Data_to_send(current * Output_Current_to_Control_Data);
+    Set_Output_Current(current * Output_Current_to_Control_Data);
 }
 
 /**
@@ -123,6 +123,8 @@ void DVC_Motor_DJI::Motor_Control()
  */
 void DVC_Motor_DJI::Handle_Transmit_Data(uint8_t *Tx_Buffer)
 {
+    float data_to_send = Output_Current;
+
     Tx_Buffer[0] = (static_cast<int16_t>(data_to_send)) >> 8;
     Tx_Buffer[1] = static_cast<int16_t>(data_to_send);
 }
@@ -195,12 +197,12 @@ void DVC_Motor_DJI::Set_Now_Omega(float omega)
 }
 
 /**
- * @brief 设置要发送的数据
+ * @brief 设置要发送的电流
  *
  */
-void DVC_Motor_DJI::Set_Data_to_send(float data_to_send_)
+void DVC_Motor_DJI::Set_Output_Current(float output_current)
 {
-    data_to_send = data_to_send_;
+    Output_Current = output_current;
 }
 
 /**
@@ -231,12 +233,12 @@ void DVC_Motor_DJI::Set_Velocity_PID_KD(float kd_)
 }
 
 /**
- * @brief 设定角速度PID环的Feedback
+ * @brief 设定角速度PID环的FeedForward
  *
  */
-void DVC_Motor_DJI::Set_Velocity_PID_Feedback(float feedback_)
+void DVC_Motor_DJI::Set_Velocity_PID_FeedForward(float feedforward_)
 {
-    DJI_PID_Velocity->Set_FeedForward(feedback_);
+    DJI_PID_Velocity->Set_FeedForward(feedforward_);
 }
 
 /**
@@ -267,12 +269,12 @@ void DVC_Motor_DJI::Set_Position_PID_KD(float kd_)
 }
 
 /**
- * @brief 设定角速度PID环的Feedback
+ * @brief 设定角速度PID环的FeedForward
  *
  */
-void DVC_Motor_DJI::Set_Position_PID_Feedback(float feedback_)
+void DVC_Motor_DJI::Set_Position_PID_FeedForward(float feedforward_)
 {
-    DJI_PID_Position->Set_FeedForward(feedback_);
+    DJI_PID_Position->Set_FeedForward(feedforward_);
 }
 
 /**
@@ -309,4 +311,104 @@ float DVC_Motor_DJI::Get_Now_Angle()
 float DVC_Motor_DJI::Get_Now_Omega()
 {
     return Omega;
+}
+
+/**
+ * @brief 获取电机功率估计值
+ *
+ */
+float DVC_Motor_DJI::Get_Power_Estimate()
+{
+    return Power_Estimate;
+}
+
+/**
+ * @brief 设置功率衰减因数
+ *
+ */
+void DVC_Motor_DJI::Set_Power_Factor(float power_factor)
+{
+    Power_Factor = power_factor;
+}
+
+/**
+ * @brief 估计功率值
+ *
+ * @param K_0 电机建模系数
+ * @param K_1 电机建模系数
+ * @param K_2 电机建模系数
+ * @param A 电机建模系数
+ * @param Current 电流
+ * @param Omega 角速度
+ * @return
+ */
+float DVC_Motor_DJI::power_calculate(float K_0, float K_1, float K_2, float A, float Current, float Omega)
+{
+    return (K_0 * Current * Omega + K_1 * Omega * Omega + K_2 * Current * Current + A);
+}
+
+/**
+ * @brief 功率控制算法, 修改电流目标值
+ *
+ */
+void DVC_Motor_DJI::Motor_DJI_Power_Limit_Control()
+{
+    // 计算功率估计值
+    Power_Estimate = power_calculate(Power_K_0, Power_K_1, Power_K_2, Power_A, Output_Current, Omega);
+
+    // 若功率为正则考虑功率控制限制
+    if (Power_Estimate > 0.0f)
+    {
+        if (Power_Factor >= 1.0f)
+        {
+            // 无需功率控制
+        }
+        else
+        {
+            // 需要功率控制
+
+            // 根据功率估计公式解一元二次方程求电流值
+            float a = Power_K_2;
+            float b = Power_K_0 * Omega;
+            float c = Power_A + Power_K_1 * Omega * Omega - Power_Factor * Power_Estimate;
+            float delta, h;
+            delta = b * b - 4 * a * c;
+            if (delta < 0.0f)
+            {
+                // 无解
+                Power_Limit_Current = 0.0f;
+            }
+            else
+            {
+                arm_sqrt_f32(delta, &h);
+                float result_1, result_2;
+                result_1 = (-b + h) / (2.0f * a);
+                result_2 = (-b - h) / (2.0f * a);
+
+                // 两个潜在的可行电流值, 取绝对值最小的那个
+                if ((result_1 > 0.0f && result_2 < 0.0f) || (result_1 < 0.0f && result_2 > 0.0f))
+                {
+                    if ((Power_Limit_Current > 0.0f && result_1 > 0.0f) || (Power_Limit_Current < 0.0f && result_1 < 0.0f))
+                    {
+                        Power_Limit_Current = result_1;
+                    }
+                    else
+                    {
+                        Power_Limit_Current = result_2;
+                    }
+                }
+                else
+                {
+                    if (fabs(result_1) < fabs(result_2))
+                    {
+                        Power_Limit_Current = result_1;
+                    }
+                    else
+                    {
+                        Power_Limit_Current = result_2;
+                    }
+                }
+            }
+        }
+    }
 }

@@ -1,5 +1,7 @@
 #include "dvc_dr16.h"
 
+std::shared_ptr<DVC_DR16> DR16 = std::make_shared<DVC_DR16>(uart5);
+
 /**
  * @brief 遥控器构造函数
  *

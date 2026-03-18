@@ -346,3 +346,57 @@ void DVC_BMI088::BMI088_delay_ms(uint16_t ms)
         BMI088_delay_us(1000);
     }
 }
+
+/**
+ * @brief 获取X方向加速度
+ *
+ */
+float DVC_BMI088::Get_Accel_X()
+{
+    return BMI088_Accel_X;
+}
+
+/**
+ * @brief 获取Y方向加速度
+ *
+ */
+float DVC_BMI088::Get_Accel_Y()
+{
+    return BMI088_Accel_Y;
+}
+
+/**
+ * @brief 获取Z方向加速度
+ *
+ */
+float DVC_BMI088::Get_Accel_Z()
+{
+    return BMI088_Accel_Z;
+}
+
+/**
+ * @brief 获取X方向角速度
+ *
+ */
+float DVC_BMI088::Get_Gyro_X()
+{
+    return BMI088_Gyro_X;
+}
+
+/**
+ * @brief 获取Y方向角速度
+ *
+ */
+float DVC_BMI088::Get_Gyro_Y()
+{
+    return BMI088_Gyro_Y;
+}
+
+/**
+ * @brief 获取Z方向角速度
+ *
+ */
+float DVC_BMI088::Get_Gyro_Z()
+{
+    return BMI088_Gyro_Z;
+}
