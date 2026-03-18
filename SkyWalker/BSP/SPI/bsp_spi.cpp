@@ -1,14 +1,20 @@
 #include "bsp_spi.h"
 
+#include <memory>
+
+#include "dvc_motor_dji.h"
+
+std::shared_ptr<BSP_SPI> spi2 = std::make_shared<BSP_SPI>(&hspi2);
+
 /**
- * @brief  SPI初始化
+ * @brief  SPI构造函数
  *
  * @param hspi SPI句柄
  */
-void BSP_SPI::Init(SPI_HandleTypeDef* hspi)
+BSP_SPI::BSP_SPI(SPI_HandleTypeDef* hspi_)
+    : hspi(hspi_)
 {
-    _hspi = hspi;
-    HAL_SPI_Init(_hspi);
+    HAL_SPI_Init(hspi);
 }
 
 /**
@@ -19,7 +25,7 @@ void BSP_SPI::Init(SPI_HandleTypeDef* hspi)
  */
 void BSP_SPI::Transmit(uint8_t* txData,uint16_t num)
 {
-    HAL_SPI_Transmit(_hspi, txData, num, 1000);
+    HAL_SPI_Transmit(hspi, txData, num, 1000);
 }
 
 /**
@@ -31,7 +37,7 @@ void BSP_SPI::Transmit(uint8_t* txData,uint16_t num)
  */
 void BSP_SPI::Transmit_and_Receive(uint8_t* tx_data, uint8_t *rx_data,uint16_t num)
 {
-    HAL_SPI_TransmitReceive(_hspi, tx_data, rx_data, num, 1000);
+    HAL_SPI_TransmitReceive(hspi, tx_data, rx_data, num, 1000);
 }
 
 /**

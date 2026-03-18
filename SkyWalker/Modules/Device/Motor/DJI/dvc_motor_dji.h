@@ -10,6 +10,12 @@
 #define PI 3.14159
 #define RPM_to_RADPS PI / 30
 
+enum Enum_DJI_Motor_Work_Mode
+{
+    DJI_Position = 0,
+    DJI_Velocity,
+};
+
 enum Enum_Motor_Type
 {
     M3508,
@@ -21,13 +27,31 @@ class DVC_Motor_DJI
 {
 public:
 
-    DVC_Motor_DJI(std::shared_ptr<BSP_CAN> can, uint8_t id, Enum_Motor_Type motor_type);
+    DVC_Motor_DJI(std::shared_ptr<BSP_CAN> can, uint8_t id, Enum_Motor_Type motor_type, Enum_DJI_Motor_Work_Mode work_mode);
 
-    //void Init(float kp, float ki, float kd);
+    void Motor_Control();
+
+    float Get_Target_Angle();
+    float Get_Target_Omega();
+    float Get_Now_Angle();
+    float Get_Now_Omega();
 
     void Set_Target_Angle(float angle);
+    void Set_Now_Angle(float angle);
     void Set_Target_Omega(float omega);
-    void Set_Data_to_send(uint16_t data_to_send_);
+    void Set_Now_Omega(float omega);
+
+    void Set_Data_to_send(float data_to_send_);
+
+    void Set_Velocity_PID_KP(float kp_);
+    void Set_Velocity_PID_KI(float ki_);
+    void Set_Velocity_PID_KD(float kd_);
+    void Set_Velocity_PID_Feedback(float feedback_);
+
+    void Set_Position_PID_KP(float kp_);
+    void Set_Position_PID_KI(float ki_);
+    void Set_Position_PID_KD(float kd_);
+    void Set_Position_PID_Feedback(float feedback_);
 
 private:
 
@@ -36,13 +60,24 @@ private:
 
     // DJI电机的CAN通信对象
     std::shared_ptr<BSP_CAN> DJI_CAN;
+    // DJI电机的位置PID对象
+    std::shared_ptr<Alg_PID> DJI_PID_Position;
+    // DJI电机的速度PID对象
+    std::shared_ptr<Alg_PID> DJI_PID_Velocity;
 
-    // DJI电机的PID对象
-    std::shared_ptr<Alg_PID> DJI_PID;
+    // 电机最大允许电流值
+    uint8_t Motor_Max_Current;
+    // 实际电流与控制数据的映射系数
+    float Output_Current_to_Control_Data;
+
+    // 电机减速比
+    float Gearbox_Rate;
 
     // 电机控制目标量
     float Target_Angle; // 目标角度
+    float Now_Angle;    // 当前角度
     float Target_Omega; // 目标角速度
+    float Now_Omega;    // 当前角速度
 
     // 需要用到的各种ID
     uint8_t ESC_ID;               // 电机电调设置的ID
@@ -63,11 +98,12 @@ private:
     float Temperature;  // 电机当前温度
 
     // 要发送的数据
-    uint16_t data_to_send;
+    float data_to_send;
 
     // 电机类型
     Enum_Motor_Type Motor_Type;
-
+    // 电机工作类型
+    Enum_DJI_Motor_Work_Mode Work_Mode;
 };
 
 

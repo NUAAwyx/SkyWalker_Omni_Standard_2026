@@ -61,7 +61,7 @@ class BSP_CAN
 {
 public:
 
-    BSP_CAN(FDCAN_HandleTypeDef* hfdcan, CAN_Type can_type);
+    BSP_CAN(FDCAN_HandleTypeDef* hfdcan_, CAN_Type can_type);
 
     void Begin();
 
@@ -80,19 +80,19 @@ private:
     void Filter_Config(uint32_t id_type, uint32_t filter_index, uint32_t filter_type, uint32_t filter_config, uint32_t filter_id1, int32_t filter_id2);
 
     // CAN通信句柄
-    FDCAN_HandleTypeDef* hfdcan_;
+    FDCAN_HandleTypeDef* hfdcan;
 
     // CAN通信类型
     CAN_Type CAN_Type_Used;
 
     // 发送填充回调函数，multimap允许一个键对应多个值
-    std::multimap<uint16_t, Struct_FDCAN_Transmit_Management> transmit_map;
+    std::multimap<uint16_t, Struct_FDCAN_Transmit_Management> transmit_callback_map;
     // 接收回调函数映射表，将ID与回调函数绑定，map只能一个键和一个值对应
-    std::map<uint32_t, FDCAN_ReceiveCallback> receive_map;
+    std::map<uint32_t, FDCAN_ReceiveCallback> receive_callback_map;
 };
 
-extern std::shared_ptr<BSP_CAN> fdcan1;
-extern std::shared_ptr<BSP_CAN> fdcan2;
-extern std::shared_ptr<BSP_CAN> fdcan3;
+extern std::shared_ptr<BSP_CAN> fdcan1; // 云台CAN（Pitch电机+两个摩擦轮）
+extern std::shared_ptr<BSP_CAN> fdcan2; // YAW电机CAN
+extern std::shared_ptr<BSP_CAN> fdcan3; // 底盘CAN（4个轮电机+拨盘）
 
 #endif

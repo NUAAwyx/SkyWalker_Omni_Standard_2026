@@ -1,13 +1,12 @@
 #include "dvc_bmi088.h"
 
 /**
- * @brief  BMI088初始化
+ * @brief  BMI088构造函数
  *
  */
-void DVC_BMI088::Init()
+DVC_BMI088::DVC_BMI088(std::shared_ptr<BSP_SPI> spi_)
+    :BMI088_SPI(spi_)
 {
-    BMI088_SPI = std::make_shared<BSP_SPI>();
-    BMI088_SPI->Init(&hspi2);
     Accel_Init();
     Gyro_Init();
 }

@@ -48,11 +48,11 @@
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-/* Definitions for IMUTask */
-osThreadId_t IMUTaskHandle;
-const osThreadAttr_t IMUTask_attributes = {
-  .name = "IMUTask",
-  .stack_size = 128 * 4,
+/* Definitions for AimBoosterTask */
+osThreadId_t AimBoosterTaskHandle;
+const osThreadAttr_t AimBoosterTask_attributes = {
+  .name = "AimBoosterTask",
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
 /* Definitions for ChassisTask */
@@ -66,7 +66,7 @@ const osThreadAttr_t ChassisTask_attributes = {
 osThreadId_t GimbalTaskHandle;
 const osThreadAttr_t GimbalTask_attributes = {
   .name = "GimbalTask",
-  .stack_size = 128 * 4,
+  .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
 
@@ -75,7 +75,7 @@ const osThreadAttr_t GimbalTask_attributes = {
 
 /* USER CODE END FunctionPrototypes */
 
-void StartIMUTask(void *argument);
+void StartAimBoosterTask(void *argument);
 void StartChassisTask(void *argument);
 void StartGimbalTask(void *argument);
 
@@ -108,8 +108,8 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of IMUTask */
-  IMUTaskHandle = osThreadNew(StartIMUTask, NULL, &IMUTask_attributes);
+  /* creation of AimBoosterTask */
+  AimBoosterTaskHandle = osThreadNew(StartAimBoosterTask, NULL, &AimBoosterTask_attributes);
 
   /* creation of ChassisTask */
   ChassisTaskHandle = osThreadNew(StartChassisTask, NULL, &ChassisTask_attributes);
@@ -127,22 +127,22 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartIMUTask */
+/* USER CODE BEGIN Header_StartAimBoosterTask */
 /**
-  * @brief  Function implementing the IMUTask thread.
+  * @brief  Function implementing the AimBoosterTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartIMUTask */
-__weak void StartIMUTask(void *argument)
+/* USER CODE END Header_StartAimBoosterTask */
+__weak void StartAimBoosterTask(void *argument)
 {
-  /* USER CODE BEGIN StartIMUTask */
+  /* USER CODE BEGIN StartAimBoosterTask */
   /* Infinite loop */
   for(;;)
   {
     osDelay(1);
   }
-  /* USER CODE END StartIMUTask */
+  /* USER CODE END StartAimBoosterTask */
 }
 
 /* USER CODE BEGIN Header_StartChassisTask */
