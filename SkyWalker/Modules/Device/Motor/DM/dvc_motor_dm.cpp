@@ -26,10 +26,10 @@ DVC_Motor_DM::DVC_Motor_DM(std::shared_ptr<BSP_CAN> can, Enum_Motor_DM_MODE moto
     Transmit_ID = CAN_ID + ID_Offset;
 
     // 使能电机
-    DM_CAN->Send_Data(Transmit_ID, DM_Motor_CAN_Message_Clear_Error, 8); // 发送清除错误信息的CAN消息
-    HAL_Delay(1);
+    //DM_CAN->Send_Data(Transmit_ID, DM_Motor_CAN_Message_Clear_Error, 8); // 发送清除错误信息的CAN消息
+    //osDelay(1);
     DM_CAN->Send_Data(Transmit_ID, DM_Motor_CAN_Message_Enter, 8); // 发送使能电机的CAN消息
-    HAL_Delay(1);
+    //HAL_Delay(1);
 
     // 注册发送回调函数
     DM_CAN->Register_TransmitCallback(Transmit_ID,0,[this](uint8_t* Tx_Buffer)

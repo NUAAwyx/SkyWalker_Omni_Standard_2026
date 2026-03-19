@@ -14,8 +14,17 @@ std::shared_ptr<BSP_SPI> spi2 = std::make_shared<BSP_SPI>(&hspi2);
 BSP_SPI::BSP_SPI(SPI_HandleTypeDef* hspi_)
     : hspi(hspi_)
 {
-    HAL_SPI_Init(hspi);
+
 }
+
+// /**
+//  * @brief 初始化SPI
+//  *
+//  */
+// void BSP_SPI::Initialize_SPI()
+// {
+//     HAL_SPI_Init(hspi);
+// }
 
 /**
  * @brief  SPI发送数据

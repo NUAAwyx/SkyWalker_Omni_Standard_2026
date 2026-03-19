@@ -67,8 +67,8 @@ private:
     void Get_Reg(GPIO_TypeDef* _cs_port,uint16_t _cs_pin);
     void Set_Tx_Buffer(uint8_t reg_add, uint8_t data, uint16_t receive_num);
 
-    void BMI088_delay_us(uint16_t us);
-    void BMI088_delay_ms(uint16_t ms);
+    void BMI088_delay_us(uint32_t us);
+    void BMI088_delay_ms(uint32_t ms);
 
     std::shared_ptr<BSP_SPI> BMI088_SPI;
 

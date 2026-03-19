@@ -297,52 +297,64 @@ void DVC_BMI088::Set_Tx_Buffer(uint8_t reg_add, uint8_t data, uint16_t receive_n
     BMI088_Now_Need_Data_Num = receive_num + 1;
 }
 
-/**
- * @brief BMI088微秒级延时函数
- *
- * @param us 延时微秒数
- */
-void DVC_BMI088::BMI088_delay_us(uint16_t us)
-{
-    uint32_t ticks = 0;
-    uint32_t told = 0;
-    uint32_t tnow = 0;
-    uint32_t tcnt = 0;
-    uint32_t reload = 0;
-    reload = SysTick->LOAD;
-    ticks = us * 480;
-    told = SysTick->VAL;
-    while (true)
-    {
-        tnow = SysTick->VAL;
-        if (tnow != told)
-        {
-            if (tnow < told)
-            {
-                tcnt += told - tnow;
-            }
-            else
-            {
-                tcnt += reload - tnow + told;
-            }
-            told = tnow;
-            if (tcnt >= ticks)
-            {
-                break;
-            }
-        }
-    }
+// /**
+//  * @brief BMI088微秒级延时函数
+//  *
+//  * @param us 延时微秒数
+//  */
+// void DVC_BMI088::BMI088_delay_us(uint16_t us)
+// {
+//     uint32_t ticks = 0;
+//     uint32_t told = 0;
+//     uint32_t tnow = 0;
+//     uint32_t tcnt = 0;
+//     uint32_t reload = 0;
+//     reload = SysTick->LOAD;
+//     ticks = us * 480;
+//     told = SysTick->VAL;
+//     while (true)
+//     {
+//         tnow = SysTick->VAL;
+//         if (tnow != told)
+//         {
+//             if (tnow < told)
+//             {
+//                 tcnt += told - tnow;
+//             }
+//             else
+//             {
+//                 tcnt += reload - tnow + told;
+//             }
+//             told = tnow;
+//             if (tcnt >= ticks)
+//             {
+//                 break;
+//             }
+//         }
+//     }
+// }
+//
+// /**
+//  * @brief BMI088毫秒级延时函数
+//  *
+//  * @param ms 延时毫秒数
+//  */
+// void DVC_BMI088::BMI088_delay_ms(uint16_t ms)
+// {
+//     while(ms--)
+//     {
+//         BMI088_delay_us(1000);
+//     }
+// }
+
+void DVC_BMI088::BMI088_delay_us(uint32_t us) {
+    uint32_t start = DWT->CYCCNT;
+    uint32_t ticks = us * (SystemCoreClock / 1000000); // 计算所需周期数
+    while ((DWT->CYCCNT - start) < ticks);
 }
 
-/**
- * @brief BMI088毫秒级延时函数
- *
- * @param ms 延时毫秒数
- */
-void DVC_BMI088::BMI088_delay_ms(uint16_t ms)
-{
-    while(ms--)
-    {
+void DVC_BMI088::BMI088_delay_ms(uint32_t ms) {
+    for (uint32_t i = 0; i < ms; i++) {
         BMI088_delay_us(1000);
     }
 }

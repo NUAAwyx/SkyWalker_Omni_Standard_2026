@@ -2,6 +2,9 @@
 
 std::shared_ptr<APP_Gimbal> Gimbal = std::make_shared<APP_Gimbal>();
 
+std::shared_ptr<DVC_Motor_DJI> APP_Gimbal::pitch_motor;
+std::shared_ptr<DVC_Motor_DM> APP_Gimbal::yaw_motor;
+
 /**
  * @brief 云台构造函数
  *

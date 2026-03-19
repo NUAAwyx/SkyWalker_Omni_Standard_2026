@@ -9,7 +9,6 @@
 #include "Alg_PID.h"
 
 #define Encoder_Max_Value 8192
-#define PI 3.14159
 #define RPM_to_RADPS PI / 30
 
 // 功率计算系数

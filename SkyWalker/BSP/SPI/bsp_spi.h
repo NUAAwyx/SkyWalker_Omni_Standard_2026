@@ -10,6 +10,7 @@ class BSP_SPI
 public:
 
     BSP_SPI(SPI_HandleTypeDef* hspi_);
+    //void Initialize_SPI();
     void Transmit(uint8_t* txData,uint16_t num);
     void Transmit_and_Receive(uint8_t* tx_data, uint8_t *rx_data,uint16_t num);
     void CS_High(GPIO_TypeDef* _gpio_port, uint16_t _gpio_pin);

@@ -17,6 +17,8 @@ public:
 
     APP_Chassis();
 
+    void Initialize_Chassis();
+
     void Chassis_Control();
 
     void Inverse_Kinematics();

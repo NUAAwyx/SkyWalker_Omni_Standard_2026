@@ -2,11 +2,26 @@
 
 std::shared_ptr<APP_Chassis>Chassis = std::make_shared<APP_Chassis>();
 
+// 定义静态成员变量
+std::vector<std::shared_ptr<DVC_Motor_DJI>> APP_Chassis::chassis_motors;
+std::shared_ptr<DVC_BMI088> APP_Chassis::BMI088;
+std::shared_ptr<Alg_PID> APP_Chassis::Velocity_PID;
+std::shared_ptr<Alg_PID> APP_Chassis::Omega_PID;
+
+
 /**
  * @brief 构造函数
  *
  */
 APP_Chassis::APP_Chassis()
+{
+}
+
+/**
+ * @brief 底盘初始化配置
+ *
+ */
+void APP_Chassis::Initialize_Chassis()
 {
     // 创建电机
     chassis_motors.push_back(std::make_shared<DVC_Motor_DJI>(fdcan3, 1, M3508, DJI_Velocity));
@@ -20,6 +35,7 @@ APP_Chassis::APP_Chassis()
     // 创建平动和角速度环PID对象
     Velocity_PID = std::make_shared<Alg_PID>(0,0,0,0,0,0,0,0);
     Omega_PID = std::make_shared<Alg_PID>(0,0,0,0,0,0,0,0);
+
 }
 
 /**
@@ -169,6 +185,23 @@ void APP_Chassis::Set_Gimbal_to_Chassis_Theta(float theta)
     Gimbal_to_Chassis_Theta = theta;
 }
 
+/**
+ * @brief 设置底盘X方向目标牵引力
+ *
+ */
+void APP_Chassis::Set_Chassis_Target_Force_X(float force_x)
+{
+    Chassis_Target_Force_X = force_x;
+}
+
+/**
+ * @brief 设置底盘Y方向目标牵引
+ *
+ */
+void APP_Chassis::Set_Chassis_Target_Force_Y(float force_y)
+{
+    Chassis_Target_Force_Y = force_y;
+}
 
 
 /**
@@ -179,7 +212,6 @@ void APP_Chassis::Set_Chassis_Target_Torque(float torque)
 {
     Chassis_Target_Torque = torque;
 }
-
 
 /**
  * @brief 轮向电机功率控制

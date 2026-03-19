@@ -9,7 +9,7 @@
 #include "dvc_vofa.h"
 
 
-static std::shared_ptr<DVC_VOFA> VOFA;
+//static std::shared_ptr<DVC_VOFA> VOFA;
 
 
 uint8_t vofa_send_data[4];
@@ -21,11 +21,14 @@ void Task_Init()
     fdcan2->Begin();
     fdcan3->Begin();
 
+    // 开启SPI通信
+    //spi2->Initialize_SPI();
 
+    Chassis->Initialize_Chassis();
 
 
     // 创建VOFA，以供电机调参
-    VOFA = std::make_shared<DVC_VOFA>(usart10,JustFloat);
+    //VOFA = std::make_shared<DVC_VOFA>(usart10,JustFloat);
     // 以下部分用于测试
 
 
@@ -94,4 +97,5 @@ void StartFDCANTransmitTask(void *argument)
     fdcan1->FDCAN_Transmit_Task();
     fdcan2->FDCAN_Transmit_Task();
     fdcan3->FDCAN_Transmit_Task();
+    osDelay(10);
 }
