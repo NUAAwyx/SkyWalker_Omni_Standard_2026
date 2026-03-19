@@ -75,10 +75,10 @@ DVC_Motor_DJI::DVC_Motor_DJI(std::shared_ptr<BSP_CAN> can, uint8_t id, Enum_Moto
         this->Handle_Receive_Data(Receive_Management);
     });
 
-    // 设置电机PID位置环参数
-    DJI_PID_Position = std::make_shared<Alg_PID>(0, 0, 0, 0, 0, 0, 0, 0);
-    // 设置电机PID速度环参数
-    DJI_PID_Velocity = std::make_shared<Alg_PID>(0, 0, 0, 0, 0, 0, 0, 0);
+    // 创建电机PID位置环对象
+    DJI_PID_Position = std::make_shared<Alg_PID>();
+    // 创建电机PID速度环对象
+    DJI_PID_Velocity = std::make_shared<Alg_PID>();
 }
 
 /**
@@ -114,6 +114,8 @@ void DVC_Motor_DJI::Motor_Control()
     if (current < -Motor_Max_Current) current = -Motor_Max_Current;
 
     Set_Output_Current(current * Output_Current_to_Control_Data);
+
+    Motor_DJI_Power_Limit_Control();
 }
 
 /**
@@ -206,78 +208,6 @@ void DVC_Motor_DJI::Set_Output_Current(float output_current)
 }
 
 /**
- * @brief 设定角速度PID环的KP
- *
- */
-void DVC_Motor_DJI::Set_Velocity_PID_KP(float kp_)
-{
-    DJI_PID_Velocity->Set_KP(kp_);
-}
-
-/**
- * @brief 设定角速度PID环的KI
- *
- */
-void DVC_Motor_DJI::Set_Velocity_PID_KI(float ki_)
-{
-    DJI_PID_Velocity->Set_KI(ki_);
-}
-
-/**
- * @brief 设定角速度PID环的KD
- *
- */
-void DVC_Motor_DJI::Set_Velocity_PID_KD(float kd_)
-{
-    DJI_PID_Velocity->Set_KD(kd_);
-}
-
-/**
- * @brief 设定角速度PID环的FeedForward
- *
- */
-void DVC_Motor_DJI::Set_Velocity_PID_FeedForward(float feedforward_)
-{
-    DJI_PID_Velocity->Set_FeedForward(feedforward_);
-}
-
-/**
- * @brief 设定角度PID环的KP
- *
- */
-void DVC_Motor_DJI::Set_Position_PID_KP(float kp_)
-{
-    DJI_PID_Position->Set_KP(kp_);
-}
-
-/**
- * @brief 设定角速度PID环的KI
- *
- */
-void DVC_Motor_DJI::Set_Position_PID_KI(float ki_)
-{
-    DJI_PID_Position->Set_KI(ki_);
-}
-
-/**
- * @brief 设定角速度PID环的KD
- *
- */
-void DVC_Motor_DJI::Set_Position_PID_KD(float kd_)
-{
-    DJI_PID_Position->Set_KD(kd_);
-}
-
-/**
- * @brief 设定角速度PID环的FeedForward
- *
- */
-void DVC_Motor_DJI::Set_Position_PID_FeedForward(float feedforward_)
-{
-    DJI_PID_Position->Set_FeedForward(feedforward_);
-}
-
-/**
  * @brief 获取电机目标角度值
  *
  */
@@ -334,12 +264,12 @@ void DVC_Motor_DJI::Set_Power_Factor(float power_factor)
 /**
  * @brief 估计功率值
  *
- * @param K_0 电机建模系数
- * @param K_1 电机建模系数
- * @param K_2 电机建模系数
- * @param A 电机建模系数
- * @param Current 电流
- * @param Omega 角速度
+ * @param K_0       电机建模系数
+ * @param K_1       电机建模系数
+ * @param K_2       电机建模系数
+ * @param A         电机建模系数
+ * @param Current   电流
+ * @param Omega     角速度
  * @return
  */
 float DVC_Motor_DJI::power_calculate(float K_0, float K_1, float K_2, float A, float Current, float Omega)
@@ -409,6 +339,9 @@ void DVC_Motor_DJI::Motor_DJI_Power_Limit_Control()
                     }
                 }
             }
+            // 将功率控制后的电流赋值给输出电流做最终输出
+            Output_Current = Power_Limit_Current;
+
         }
     }
 }

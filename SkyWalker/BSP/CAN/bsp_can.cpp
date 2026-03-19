@@ -22,13 +22,6 @@ BSP_CAN::BSP_CAN(FDCAN_HandleTypeDef* hfdcan_, CAN_Type can_type)
  */
 void BSP_CAN::Begin()
 {
-    HAL_FDCAN_Start(hfdcan);
-
-    //打开FIFO0区的新数据接收中断，FIFO模式不涉及具体缓冲区索引，所以bufferIndexes设0
-    HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
-    //打开FIFO1区的新数据接收中断，FIFO模式不涉及具体缓冲区索引，所以bufferIndexes设0
-    HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO1_NEW_MESSAGE, 0);
-
     if (hfdcan->Instance == FDCAN1)
     {
         // 配置滤波器
@@ -53,6 +46,14 @@ void BSP_CAN::Begin()
         // 配置滤波器1，标准帧，mask模式，绑定到FIFO1，ID1为希望接收的ID，ID2为掩码
         Filter_Config(FDCAN_STANDARD_ID, 1, FDCAN_FILTER_MASK, FDCAN_FILTER_TO_RXFIFO1, 0x000, 0x000);
     }
+
+    HAL_FDCAN_Start(hfdcan);
+
+    //打开FIFO0区的新数据接收中断，FIFO模式不涉及具体缓冲区索引，所以bufferIndexes设0
+    HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0);
+    //打开FIFO1区的新数据接收中断，FIFO模式不涉及具体缓冲区索引，所以bufferIndexes设0
+    HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO1_NEW_MESSAGE, 0);
+
 }
 
 /**

@@ -4,10 +4,16 @@
  * @brief PID类构造函数
  *
  */
-Alg_PID::Alg_PID(float kp, float ki, float kd, float feedforward, float i_out_max, float output_max, float dead_zone, float i_sep_threshold)
-    :KP(kp), KI(ki), KD(kd), FeedForward(feedforward),
-     I_Out_Max(i_out_max), Output_Max(output_max), Dead_Zone(dead_zone), I_Sep_Threshold(i_sep_threshold)
+Alg_PID::Alg_PID()
 {
+    KP = 0;
+    KI = 0;
+    KD = 0;
+    FeedForward = 0;
+    I_Out_Max = 0;
+    Output_Max = 0;
+    Dead_Zone = 0;
+    I_Sep_Threshold = 0;
     p_out = 0;
     i_out = 0;
     d_out = 0;
@@ -16,6 +22,30 @@ Alg_PID::Alg_PID(float kp, float ki, float kd, float feedforward, float i_out_ma
     Now = 0;
     Target = 0;
     Output = 0;
+}
+
+/**
+ * @brief 设置PID所需参数
+ *
+ */
+void Alg_PID::Set_PID_Parameters(float kp, float ki, float kd, float i_out_max, float output_max, float dead_zone, float i_sep_threshold)
+{
+    KP = kp;
+    KI = ki;
+    KD = kd;
+    I_Out_Max = i_out_max;
+    Output_Max = output_max;
+    Dead_Zone = dead_zone;
+    I_Sep_Threshold = i_sep_threshold;
+}
+
+/**
+ * @brief 设置PID前馈值
+ *
+ */
+void Alg_PID::Set_PID_FeedForward(float feedforward)
+{
+    FeedForward = feedforward;
 }
 
 /**
@@ -96,40 +126,4 @@ void Alg_PID::Set_Now(float now)
 void Alg_PID::Set_Target(float target)
 {
     Target = target;
-}
-
-/**
- * @brief 设定KP
- *
- */
-void Alg_PID::Set_KP(float kp)
-{
-    KP = kp;
-}
-
-/**
- * @brief 设定KI
- *
- */
-void Alg_PID::Set_KI(float ki)
-{
-    KI = ki;
-}
-
-/**
- * @brief 设定KD
- *
- */
-void Alg_PID::Set_KD(float kd)
-{
-    KD = kd;
-}
-
-/**
- * @brief 设定前馈值
- *
- */
-void Alg_PID::Set_FeedForward(float feedforward)
-{
-    FeedForward = feedforward;
 }

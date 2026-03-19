@@ -38,8 +38,6 @@ public:
 
     void Motor_Control();
 
-    void Motor_DJI_Power_Limit_Control();
-
     float Get_Target_Angle();
     float Get_Target_Omega();
     float Get_Now_Angle();
@@ -55,15 +53,11 @@ public:
 
     void Set_Output_Current(float output_current);
 
-    void Set_Velocity_PID_KP(float kp_);
-    void Set_Velocity_PID_KI(float ki_);
-    void Set_Velocity_PID_KD(float kd_);
-    void Set_Velocity_PID_FeedForward(float feedforward_);
+    // DJI电机的位置PID对象
+    std::shared_ptr<Alg_PID> DJI_PID_Position;
+    // DJI电机的速度PID对象
+    std::shared_ptr<Alg_PID> DJI_PID_Velocity;
 
-    void Set_Position_PID_KP(float kp_);
-    void Set_Position_PID_KI(float ki_);
-    void Set_Position_PID_KD(float kd_);
-    void Set_Position_PID_FeedForward(float feedforward_);
 
 private:
 
@@ -71,14 +65,11 @@ private:
     void Handle_Receive_Data(const Struct_FDCAN_Receive_Management& Receive_Management);
 
     float power_calculate(float K_0, float K_1, float K_2, float A, float Current, float Omega);
+    void Motor_DJI_Power_Limit_Control();
+
 
     // DJI电机的CAN通信对象
     std::shared_ptr<BSP_CAN> DJI_CAN;
-    // DJI电机的位置PID对象
-    std::shared_ptr<Alg_PID> DJI_PID_Position;
-    // DJI电机的速度PID对象
-    std::shared_ptr<Alg_PID> DJI_PID_Velocity;
-
     // 电机最大允许电流值
     uint8_t Motor_Max_Current;
     // 实际电流与控制数据的映射系数

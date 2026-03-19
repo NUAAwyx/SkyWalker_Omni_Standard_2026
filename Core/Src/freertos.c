@@ -48,17 +48,17 @@
 /* USER CODE BEGIN Variables */
 
 /* USER CODE END Variables */
-/* Definitions for AimBoosterTask */
-osThreadId_t AimBoosterTaskHandle;
-const osThreadAttr_t AimBoosterTask_attributes = {
-  .name = "AimBoosterTask",
-  .stack_size = 512 * 4,
-  .priority = (osPriority_t) osPriorityHigh,
-};
 /* Definitions for ChassisTask */
 osThreadId_t ChassisTaskHandle;
 const osThreadAttr_t ChassisTask_attributes = {
   .name = "ChassisTask",
+  .stack_size = 512 * 4,
+  .priority = (osPriority_t) osPriorityHigh,
+};
+/* Definitions for AimBoosterTask */
+osThreadId_t AimBoosterTaskHandle;
+const osThreadAttr_t AimBoosterTask_attributes = {
+  .name = "AimBoosterTask",
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
@@ -69,10 +69,10 @@ const osThreadAttr_t GimbalTask_attributes = {
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
-/* Definitions for FDCANTransmitTa */
-osThreadId_t FDCANTransmitTaHandle;
-const osThreadAttr_t FDCANTransmitTa_attributes = {
-  .name = "FDCANTransmitTa",
+/* Definitions for FDCANTransmitTask */
+osThreadId_t FDCANTransmitTaskHandle;
+const osThreadAttr_t FDCANTransmitTask_attributes = {
+  .name = "FDCANTransmitTask",
   .stack_size = 512 * 4,
   .priority = (osPriority_t) osPriorityHigh,
 };
@@ -82,8 +82,8 @@ const osThreadAttr_t FDCANTransmitTa_attributes = {
 
 /* USER CODE END FunctionPrototypes */
 
-void StartAimBoosterTask(void *argument);
 void StartChassisTask(void *argument);
+void StartAimBoosterTask(void *argument);
 void StartGimbalTask(void *argument);
 void StartFDCANTransmitTask(void *argument);
 
@@ -116,17 +116,17 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of AimBoosterTask */
-  AimBoosterTaskHandle = osThreadNew(StartAimBoosterTask, NULL, &AimBoosterTask_attributes);
-
   /* creation of ChassisTask */
   ChassisTaskHandle = osThreadNew(StartChassisTask, NULL, &ChassisTask_attributes);
+
+  /* creation of AimBoosterTask */
+  AimBoosterTaskHandle = osThreadNew(StartAimBoosterTask, NULL, &AimBoosterTask_attributes);
 
   /* creation of GimbalTask */
   GimbalTaskHandle = osThreadNew(StartGimbalTask, NULL, &GimbalTask_attributes);
 
-  /* creation of FDCANTransmitTa */
-  FDCANTransmitTaHandle = osThreadNew(StartFDCANTransmitTask, NULL, &FDCANTransmitTa_attributes);
+  /* creation of FDCANTransmitTask */
+  FDCANTransmitTaskHandle = osThreadNew(StartFDCANTransmitTask, NULL, &FDCANTransmitTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -138,30 +138,12 @@ void MX_FREERTOS_Init(void) {
 
 }
 
-/* USER CODE BEGIN Header_StartAimBoosterTask */
+/* USER CODE BEGIN Header_StartChassisTask */
 /**
-  * @brief  Function implementing the AimBoosterTask thread.
+  * @brief  Function implementing the ChassisTask thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_StartAimBoosterTask */
-__weak void StartAimBoosterTask(void *argument)
-{
-  /* USER CODE BEGIN StartAimBoosterTask */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END StartAimBoosterTask */
-}
-
-/* USER CODE BEGIN Header_StartChassisTask */
-/**
-* @brief Function implementing the ChassisTask thread.
-* @param argument: Not used
-* @retval None
-*/
 /* USER CODE END Header_StartChassisTask */
 __weak void StartChassisTask(void *argument)
 {
@@ -172,6 +154,24 @@ __weak void StartChassisTask(void *argument)
     osDelay(1);
   }
   /* USER CODE END StartChassisTask */
+}
+
+/* USER CODE BEGIN Header_StartAimBoosterTask */
+/**
+* @brief Function implementing the AimBoosterTask thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartAimBoosterTask */
+__weak void StartAimBoosterTask(void *argument)
+{
+  /* USER CODE BEGIN StartAimBoosterTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartAimBoosterTask */
 }
 
 /* USER CODE BEGIN Header_StartGimbalTask */
@@ -194,7 +194,7 @@ __weak void StartGimbalTask(void *argument)
 
 /* USER CODE BEGIN Header_StartFDCANTransmitTask */
 /**
-* @brief Function implementing the FDCANTransmitTa thread.
+* @brief Function implementing the FDCANTransmitTask thread.
 * @param argument: Not used
 * @retval None
 */

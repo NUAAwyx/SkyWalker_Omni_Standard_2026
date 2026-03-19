@@ -6,9 +6,10 @@ extern "C" {
 #endif
 
 void Task_Init();
-void StartIMUTask(void *argument);
+void StartAimBoosterTask(void *argument);
 void StartChassisTask(void *argument);
 void StartGimbalTask(void *argument);
+void StartFDCANTransmitTask(void *argument);
 
 #ifdef __cplusplus
 }

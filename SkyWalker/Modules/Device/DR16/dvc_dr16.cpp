@@ -63,5 +63,291 @@ void DVC_DR16::Handle_Receive_Data(const Struct_UART_Receive_Management& Receive
     c = key & KEY_PRESSED_OFFSET_C;
     v = key & KEY_PRESSED_OFFSET_V;
     b = key & KEY_PRESSED_OFFSET_B;
+}
 
+
+/**
+ * @brief 获取右拨杆X方向值
+ *
+ */
+int16_t DVC_DR16::Get_Right_X()
+{
+    return Right_X;
+}
+
+/**
+ * @brief 获取右拨杆Y方向值
+ *
+ */
+int16_t DVC_DR16::Get_Right_Y()
+{
+    return Right_Y;
+}
+
+/**
+ * @brief 获取左拨杆X方向值
+ *
+ */
+int16_t DVC_DR16::Get_Left_X()
+{
+    return Left_X;
+}
+
+/**
+ * @brief 获取左拨杆Y方向值
+ *
+ */
+int16_t DVC_DR16::Get_Left_Y()
+{
+    return Left_Y;
+}
+
+/**
+
+@brief 获取前轮值
+
+*/
+int16_t DVC_DR16::Get_Front_Wheel()
+{
+    return Left_Front_Wheel;
+}
+
+/**
+
+@brief 获取左拨动开关状态
+
+*/
+uint8_t DVC_DR16::Get_Switch_L()
+{
+    return switch_L;
+}
+
+/**
+
+@brief 获取右拨动开关状态
+
+*/
+uint8_t DVC_DR16::Get_Switch_R()
+{
+    return switch_R;
+}
+
+/**
+
+@brief 获取鼠标X轴值
+
+*/
+int16_t DVC_DR16::Get_Mouse_X()
+{
+    return mouse_x;
+}
+
+/**
+
+@brief 获取鼠标Y轴值
+
+*/
+int16_t DVC_DR16::Get_Mouse_Y()
+{
+    return mouse_y;
+}
+
+/**
+
+@brief 获取鼠标Z轴值（滚轮）
+
+*/
+int16_t DVC_DR16::Get_Mouse_Z()
+{
+    return mouse_z;
+}
+
+/**
+
+@brief 获取鼠标左键按下状态
+
+*/
+uint8_t DVC_DR16::Get_Mouse_Press_L()
+{
+    return mouse_press_l;
+}
+
+/**
+
+@brief 获取鼠标右键按下状态
+
+*/
+uint8_t DVC_DR16::Get_Mouse_Press_R()
+{
+    return mouse_press_r;
+}
+
+/**
+
+@brief 获取鼠标中键按下状态
+
+*/
+uint8_t DVC_DR16::Get_Mouse_Press_M()
+{
+    return mouse_press_m;
+}
+
+/**
+
+@brief 获取W键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_W()
+{
+    return w;
+}
+
+/**
+
+@brief 获取S键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_S()
+{
+    return s;
+}
+
+/**
+
+@brief 获取A键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_A()
+{
+    return a;
+}
+
+/**
+
+@brief 获取D键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_D()
+{
+    return d;
+}
+
+/**
+
+@brief 获取Shift键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_Shift()
+{
+    return shift;
+}
+
+/**
+
+@brief 获取Ctrl键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_Ctrl()
+{
+    return ctrl;
+}
+
+/**
+
+@brief 获取Q键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_Q()
+{
+    return q;
+}
+
+/**
+
+@brief 获取E键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_E()
+{
+    return e;
+}
+
+/**
+
+@brief 获取R键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_R()
+{
+    return r;
+}
+
+/**
+
+@brief 获取F键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_F()
+{
+    return f;
+}
+
+/**
+
+@brief 获取G键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_G()
+{
+    return g;
+}
+
+/**
+
+@brief 获取Z键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_Z()
+{
+    return z;
+}
+
+/**
+
+@brief 获取X键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_X()
+{
+    return x;
+}
+
+/**
+
+@brief 获取C键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_C()
+{
+    return c;
+}
+
+/**
+
+@brief 获取V键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_V()
+{
+    return v;
+}
+
+/**
+
+@brief 获取B键状态
+
+*/
+uint8_t DVC_DR16::Get_Key_B()
+{
+    return b;
 }

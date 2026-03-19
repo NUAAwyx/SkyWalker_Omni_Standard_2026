@@ -41,6 +41,45 @@ public:
 
     void Handle_Receive_Data(const Struct_UART_Receive_Management& Receive_Management);
 
+    // 外界获取遥控器值
+    int16_t Get_Right_X();
+    int16_t Get_Right_Y();
+    int16_t Get_Left_X();
+    int16_t Get_Left_Y();
+    int16_t Get_Front_Wheel();
+
+    uint8_t Get_Switch_L();
+    uint8_t Get_Switch_R();
+
+    int16_t Get_Mouse_X();
+    int16_t Get_Mouse_Y();
+    int16_t Get_Mouse_Z();
+    uint8_t Get_Mouse_Press_L();
+    uint8_t Get_Mouse_Press_R();
+    uint8_t Get_Mouse_Press_M();
+
+    uint8_t Get_Key_W();
+    uint8_t Get_Key_S();
+    uint8_t Get_Key_A();
+    uint8_t Get_Key_D();
+    uint8_t Get_Key_Shift();
+    uint8_t Get_Key_Ctrl();
+    uint8_t Get_Key_Q();
+    uint8_t Get_Key_E();
+    uint8_t Get_Key_R();
+    uint8_t Get_Key_F();
+    uint8_t Get_Key_G();
+    uint8_t Get_Key_Z();
+    uint8_t Get_Key_X();
+    uint8_t Get_Key_C();
+    uint8_t Get_Key_V();
+    uint8_t Get_Key_B();
+
+private:
+
+    // 串口类指针
+    std::shared_ptr<BSP_USART> uart;
+
     //遥控器数据
     int16_t Right_X;
     int16_t Right_Y;
@@ -76,11 +115,6 @@ public:
     uint8_t c;
     uint8_t v;
     uint8_t b;
-
-private:
-
-    // 串口类指针
-    std::shared_ptr<BSP_USART> uart;
 
 };
 

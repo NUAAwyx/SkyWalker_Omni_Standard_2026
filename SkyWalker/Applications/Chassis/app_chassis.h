@@ -8,8 +8,9 @@
 
 #include <vector>
 
-#define Chassis_Radis 0.15  // 底盘半径，单位：m
-#define Wheel_Radis 0.01    // 轮半径，单位：m
+#define Chassis_Radius 0.15                  // 底盘半径，单位：m
+#define Wheel_Radius 0.01                    // 轮半径，单位：m
+#define Chassis_Target_Omega_Factor 3.0     // 小陀螺转速，单位：rad/s
 
 class APP_Chassis
 {
@@ -34,8 +35,14 @@ public:
     void Set_Chassis_Target_Force_X(float force_x);
     void Set_Chassis_Target_Force_Y(float force_y);
     void Set_Chassis_Target_Torque(float torque);
+    void Set_Chassis_Torque_Feedback(float feedback);
 
     void Power_Limit_Control();
+
+    // 平动速度PID对象
+    static std::shared_ptr<Alg_PID> Velocity_PID;
+    // 角速度环PID对象
+    static std::shared_ptr<Alg_PID> Omega_PID;
 
 private:
 
@@ -45,11 +52,6 @@ private:
     static std::vector<std::shared_ptr<DVC_Motor_DJI>> chassis_motors;
     // 底盘陀螺仪
     static std::shared_ptr<DVC_BMI088> BMI088;
-
-    // 平动速度PID对象
-    static std::shared_ptr<Alg_PID> Velocity_PID;
-    // 角速度环PID对象
-    static std::shared_ptr<Alg_PID> Omega_PID;
 
     // 底盘目标平动速度
     float Chassis_Target_Velocity_X;
@@ -68,6 +70,8 @@ private:
     float Chassis_Target_Torque;
     // 底盘和云台的偏角
     float Gimbal_to_Chassis_Theta;
+    // 底盘扭矩前馈
+    float Chassis_Torque_Feedback;
 
     // 当前底盘功率最大值
     float Power_Limit_Max;

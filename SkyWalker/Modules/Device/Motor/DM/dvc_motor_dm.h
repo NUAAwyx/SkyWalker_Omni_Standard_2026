@@ -77,17 +77,6 @@ public:
     void Set_Target_Omega(float omega);
     void Set_Now_Omega(float omega);
 
-    void Set_Velocity_PID_KP(float kp_);
-    void Set_Velocity_PID_KI(float ki_);
-    void Set_Velocity_PID_KD(float kd_);
-    void Set_Velocity_PID_Feedback(float feedback_);
-
-    void Set_Position_PID_KP(float kp_);
-    void Set_Position_PID_KI(float ki_);
-    void Set_Position_PID_KD(float kd_);
-    void Set_Position_PID_Feedback(float feedback_);
-
-
 private:
 
     void Handle_Transmit_Data(uint8_t *Tx_Buffer);
